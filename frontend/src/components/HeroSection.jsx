@@ -116,7 +116,7 @@ export const HeroSection = () => {
 
               <Button
                 data-testid="hero-book-consultation-btn"
-                onClick={() => scrollTo("consultation")}
+                onClick={() => scrollTo("consultation-form")}
                 className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-6 text-base font-semibold rounded-lg shadow-xl shadow-amber-600/25 transition-all duration-300 hover:shadow-amber-700/35 hover:-translate-y-0.5 group"
               >
                 Book VIP Consultation — $150

@@ -121,7 +121,7 @@ export const Header = () => {
               <div className="w-px h-6 bg-stone-300/30" />
 
               <Button data-testid="header-book-consultation-btn"
-                onClick={() => scrollTo("consultation")}
+                onClick={() => scrollTo("consultation-form")}
                 className="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 text-sm font-semibold rounded-lg shadow-lg shadow-amber-600/20 transition-all duration-200 hover:shadow-amber-700/30"
               >
                 Book VIP Consultation
@@ -163,7 +163,7 @@ export const Header = () => {
                   Call {COMPANY.phone}
                 </a>
                 <Button
-                  onClick={() => scrollTo("consultation")}
+                  onClick={() => scrollTo("consultation-form")}
                   className="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg"
                 >
                   Book VIP Consultation
