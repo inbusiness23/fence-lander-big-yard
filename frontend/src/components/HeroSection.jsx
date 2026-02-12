@@ -74,8 +74,14 @@ export const HeroSection = () => {
           </div>
 
           {/* Fee Note */}
-          <p className="text-amber-200/70 text-sm mb-10">
-            $150 consultation fee — credited in full toward your project
+          <p className="text-amber-200/70 text-sm mb-4">
+            $150 consultation fee — credited in full toward your fence project
+          </p>
+
+          {/* Financing Note */}
+          <p className="text-stone-400/80 text-sm mb-10 flex items-center gap-2">
+            <span className="w-1 h-1 rounded-full bg-amber-400/50" />
+            Pay-over-time financing available — easy to apply
           </p>
 
           {/* Trust Badges */}
