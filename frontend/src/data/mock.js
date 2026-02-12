@@ -189,8 +189,8 @@ export const FAQ_ITEMS = [
     answer: "Our Large Yard Division is a dedicated team that exclusively handles properties ¼ acre and above. You get a personal project manager, priority scheduling with same-day or next-day consultations, commercial-grade materials, and the focused attention that larger projects demand. We limit our active projects so your fence gets the care it deserves.",
   },
   {
-    question: "Why is there a $150 consultation fee?",
-    answer: "The $150 VIP consultation fee ensures we dedicate serious time and resources to your property — including a thorough on-site assessment, material samples, and a custom proposal within 48 hours. It filters out casual inquiries so we can give real buyers like you our full, undivided attention. When you move forward, the entire $150 is credited toward your fence project — so it costs you nothing.",
+    question: "Why is there a $150 consultation fee when other companies offer free estimates?",
+    answer: "That's exactly the point. Free estimates are designed to get a salesperson on your property as quickly as possible — they rush through 15-minute walkthroughs, give you a cookie-cutter quote, and move on to the next lead. Our $150 VIP consultation is fundamentally different. You get 60-90 minutes with our most experienced project manager — not a junior estimator juggling 8 appointments that day. They bring physical material samples, review your HOA requirements, walk every inch of your fence line, discuss design options, and create a genuinely custom plan. The fee ensures we only meet with homeowners who are serious, which means we can take our time and focus entirely on helping you achieve your vision. And when you move forward, the entire $150 is credited toward your project — so it costs you nothing.",
   },
   {
     question: "Do you offer financing or pay-over-time options?",
