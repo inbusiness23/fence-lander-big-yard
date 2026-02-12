@@ -175,6 +175,46 @@ class TestConsultationEndpoint:
         print("✓ Consultation correctly rejected without required fields")
 
 
+class TestSMSConsentVerification:
+    """Verify SMS consent is stored and returned in admin endpoints"""
+    
+    def test_sms_consent_stored_and_returned(self):
+        """Create consultation with smsConsent and verify it appears in admin"""
+        unique_name = f"TEST_SMSVerify_{uuid.uuid4().hex[:8]}"
+        consultation_data = {
+            "fullName": unique_name,
+            "email": "smsverify@gmail.com",
+            "phone": "(321) 555-9999",
+            "address": "999 Test Lane, Sanford, FL",
+            "yardSize": "½ – ¾ Acre",
+            "projectType": "New Fence Installation",
+            "smsConsent": True,
+            "smsConsentTimestamp": "2026-02-12T17:30:00.000Z",
+            "originUrl": "https://asap-fence-vip.preview.emergentagent.com"
+        }
+        
+        # Create the consultation
+        create_response = requests.post(f"{BASE_URL}/api/consultations", json=consultation_data)
+        assert create_response.status_code == 200
+        created_data = create_response.json()
+        consultation_id = created_data["id"]
+        
+        # Fetch from admin endpoint
+        admin_response = requests.get(f"{BASE_URL}/api/admin/consultations")
+        assert admin_response.status_code == 200
+        consultations = admin_response.json()
+        
+        # Find our consultation
+        our_consultation = next((c for c in consultations if c["id"] == consultation_id), None)
+        assert our_consultation is not None, f"Consultation {consultation_id} not found in admin"
+        
+        # Verify smsConsent is True
+        assert our_consultation.get("smsConsent") == True, "smsConsent should be True"
+        assert our_consultation.get("smsConsentTimestamp") == "2026-02-12T17:30:00.000Z", "smsConsentTimestamp should match"
+        
+        print(f"✓ SMS consent stored and returned correctly for {consultation_id}")
+
+
 class TestAdminEndpoints:
     """Admin dashboard API tests"""
     
