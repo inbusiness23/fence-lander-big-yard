@@ -222,7 +222,7 @@ export const CTASection = () => {
                 </span>
               ) : (
                 <span className="flex items-center gap-2">
-                  Schedule My VIP Consultation
+                  Schedule My VIP Consultation — $150
                   <Send className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                 </span>
               )}
