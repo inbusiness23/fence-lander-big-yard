@@ -105,13 +105,26 @@ export const WhyNotFreeSection = () => {
                 ))}
               </div>
 
-              <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-5 mb-6">
+              <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-5 mb-4">
                 <p className="text-amber-200 text-sm font-semibold mb-1">The Bottom Line</p>
                 <p className="text-stone-300 text-[15px] leading-relaxed">
                   You wouldn't expect the Ritz-Carlton to compete with a motel on price — and 
                   you wouldn't want them to. The $150 is how we ensure you get an experience 
                   that matches the size of your investment.
                 </p>
+              </div>
+
+              {/* Satisfaction Guarantee */}
+              <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-5 mb-6">
+                <div className="flex items-start gap-3">
+                  <ShieldCheck className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-emerald-300 text-sm font-semibold mb-1">{SATISFACTION_GUARANTEE.headline}</p>
+                    <p className="text-stone-400 text-sm leading-relaxed">
+                      {SATISFACTION_GUARANTEE.description}
+                    </p>
+                  </div>
+                </div>
               </div>
 
               {/* Dual CTA */}
