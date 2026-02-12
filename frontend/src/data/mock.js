@@ -114,12 +114,12 @@ export const FENCE_STYLES = [
 
 export const BEFORE_AFTER = {
   before: {
-    image: "/images/fences/before_1.png",
-    caption: "Before: Deteriorating fence, overgrown yard boundary",
+    image: "/images/fences/before_2.png",
+    caption: "Before: Beautiful yard, but the fence has seen better days",
   },
   after: {
-    image: "/images/fences/after_1.png",
-    caption: "After: Brand new vinyl privacy fence, clean professional installation",
+    image: "/images/fences/after_2.png",
+    caption: "After: Same yard, stunning new white vinyl privacy fence",
   },
 };
 
