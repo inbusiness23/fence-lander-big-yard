@@ -19,9 +19,8 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-# Stripe
-STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY')
-stripe.api_key = STRIPE_API_KEY
+# Stripe - use STRIPE_SECRET_KEY to avoid system env override
+stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
 VIP_CONSULTATION_FEE = 15000  # $150.00 in cents
 
 # Create the main app
