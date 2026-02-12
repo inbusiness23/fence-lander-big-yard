@@ -62,8 +62,8 @@ export const BeforeAfterSection = () => {
             See the Difference a Premium Fence Makes
           </h2>
           <p className="text-stone-500 text-lg leading-relaxed">
-            Drag the slider to reveal the transformation. Same yard, same angle —
-            completely different property.
+            Drag the slider to reveal the transformation. Same beautiful yard —
+            the only difference is the fence.
           </p>
         </div>
 
