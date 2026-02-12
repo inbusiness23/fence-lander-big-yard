@@ -150,13 +150,13 @@ export const CTASection = () => {
             </div>
 
             {/* Direct Call Option */}
-            <div className="p-6 rounded-xl bg-stone-800/50 border border-stone-700/50">
-              <div className="text-sm text-stone-400 mb-2">Prefer to talk now?</div>
+            <div className="p-6 rounded-xl bg-white/5 border border-white/10">
+              <div className="text-sm text-stone-400 mb-3">Ready to talk? Skip the form.</div>
               <a
-                href={`tel:${COMPANY.phone}`}
-                className="flex items-center gap-3 text-white font-semibold text-lg hover:text-amber-300 transition-colors"
+                href={`tel:${COMPANY.phone.replace(/[^0-9]/g, "")}`}
+                className="flex items-center justify-center gap-3 w-full py-4 rounded-lg bg-white text-stone-900 font-bold text-lg hover:bg-stone-100 transition-all duration-200 shadow-lg"
               >
-                <Phone className="w-5 h-5 text-amber-400" />
+                <Phone className="w-5 h-5 text-amber-700" />
                 {COMPANY.phone}
               </a>
             </div>
