@@ -26,7 +26,7 @@ export const HeroSection = () => {
           <div className="inline-flex items-center gap-2 bg-amber-700/20 border border-amber-500/30 rounded-full px-4 py-1.5 mb-8 backdrop-blur-sm">
             <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
             <span className="text-amber-200 text-sm font-medium tracking-wide">
-              Seminole County's Premier Large Yard Specialists
+              Seminole County's Premier Large Yard Fence Specialists
             </span>
           </div>
 
@@ -53,36 +53,35 @@ export const HeroSection = () => {
             {HERO.description}
           </p>
 
-          {/* CTAs */}
+          {/* Dual CTAs - Equal prominence */}
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <a href={`tel:${COMPANY.phone.replace(/[^0-9]/g, "")}`} className="flex-1 sm:flex-initial">
+              <Button
+                className="w-full sm:w-auto bg-white text-stone-900 hover:bg-stone-100 px-8 py-6 text-base font-bold rounded-lg shadow-xl transition-all duration-300 hover:-translate-y-0.5 group"
+              >
+                <Phone className="w-5 h-5 mr-2.5 text-amber-700" />
+                Call {COMPANY.phone}
+              </Button>
+            </a>
             <Button
               onClick={() => scrollTo("consultation")}
               className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-6 text-base font-semibold rounded-lg shadow-xl shadow-amber-600/25 transition-all duration-300 hover:shadow-amber-700/35 hover:-translate-y-0.5 group"
             >
-              {HERO.ctaPrimary}
+              Book VIP Consultation — $150
               <ArrowRight className="w-5 h-5 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
             </Button>
-            <a href={`tel:${COMPANY.phone}`}>
-              <Button
-                variant="outline"
-                className="border-white/25 text-white hover:bg-white/10 hover:text-white px-8 py-6 text-base font-medium rounded-lg backdrop-blur-sm transition-all duration-300 w-full sm:w-auto"
-              >
-                <Phone className="w-5 h-5 mr-2" />
-                {HERO.ctaSecondary}
-              </Button>
-            </a>
           </div>
 
-          {/* Fee Note */}
-          <p className="text-amber-200/70 text-sm mb-4">
-            $150 consultation fee — credited in full toward your fence project
-          </p>
-
-          {/* Financing Note */}
-          <p className="text-stone-400/80 text-sm mb-10 flex items-center gap-2">
-            <span className="w-1 h-1 rounded-full bg-amber-400/50" />
-            Pay-over-time financing available — easy to apply
-          </p>
+          {/* Fee + Financing Notes */}
+          <div className="flex flex-col gap-1.5 mb-10">
+            <p className="text-amber-200/70 text-sm">
+              $150 consultation fee — credited in full toward your fence project
+            </p>
+            <p className="text-stone-400/80 text-sm flex items-center gap-2">
+              <span className="w-1 h-1 rounded-full bg-amber-400/50" />
+              Pay-over-time financing available — easy to apply
+            </p>
+          </div>
 
           {/* Trust Badges */}
           <div className="flex flex-wrap gap-6 items-center">
