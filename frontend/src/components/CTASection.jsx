@@ -64,7 +64,7 @@ export const CTASection = () => {
   };
 
   return (
-    <section className="py-24 bg-stone-900" id="consultation">
+    <section data-testid="cta-section" className="py-24 bg-stone-900" id="consultation">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid lg:grid-cols-[1fr_1.2fr] gap-16 items-start">
           {/* Left - Info */}
@@ -166,6 +166,7 @@ export const CTASection = () => {
           {step === 1 ? (
             <form
               onSubmit={handleStep1Submit}
+              data-testid="consultation-form"
               className="bg-white rounded-2xl p-8 sm:p-10 shadow-2xl shadow-black/20"
             >
               {/* Step indicator */}
@@ -246,6 +247,7 @@ export const CTASection = () => {
 
               <Button
                 type="submit"
+                data-testid="consultation-step1-submit-btn"
                 className="w-full mt-8 bg-amber-700 hover:bg-amber-800 text-white py-6 text-base font-semibold rounded-lg shadow-lg shadow-amber-700/20 transition-all duration-300 hover:shadow-amber-800/30 group"
               >
                 Continue to Secure Payment — $150
@@ -338,6 +340,7 @@ export const CTASection = () => {
               <Button
                 onClick={handlePayment}
                 disabled={loading}
+                data-testid="consultation-pay-btn"
                 className="w-full bg-amber-700 hover:bg-amber-800 text-white py-6 text-base font-semibold rounded-lg shadow-lg shadow-amber-700/20 transition-all duration-300 hover:shadow-amber-800/30 group disabled:opacity-70 mb-3"
               >
                 {loading ? (
