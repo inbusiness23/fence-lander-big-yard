@@ -32,7 +32,7 @@ export const FAQSection = () => {
               </div>
               <div>
                 <div className="text-sm font-semibold text-stone-800">Still have questions?</div>
-                <div className="text-sm text-stone-500">Call (407) 555-0182 anytime</div>
+                <div className="text-sm text-stone-500">Call (321) 486-6414 anytime</div>
               </div>
             </div>
           </div>
