@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&display=swap');
+
 .App-logo {
     height: 40vmin;
     pointer-events: none;
@@ -9,21 +11,6 @@
     }
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
-}
-
-.App-link {
-    color: #61dafb;
-}
-
 @keyframes App-logo-spin {
     from {
         transform: rotate(0deg);
@@ -31,4 +18,49 @@
     to {
         transform: rotate(360deg);
     }
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f5f5f4;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #a8a29e;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #78716c;
+}
+
+/* Animate-in utility classes */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-in {
+    animation: fadeInUp 0.5s ease-out forwards;
+}
+
+/* Selection color */
+::selection {
+    background-color: #b45309;
+    color: white;
 }
