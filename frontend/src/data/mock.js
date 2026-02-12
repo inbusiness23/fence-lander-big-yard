@@ -40,7 +40,7 @@ export const YARD_SIZES = [
 
 export const DISQUALIFY_MESSAGE = {
   title: "This Division Is Exclusively for Large Properties",
-  description: "Our Large Yard Division is reserved for Seminole County homeowners with ¼ acre or more. For properties under ¼ acre, our standard team provides excellent service — call (407) 555-0180 to reach them directly.",
+  description: "Our Large Yard Division is reserved for Seminole County homeowners with ¼ acre or more. For properties under ¼ acre, our standard team provides excellent service — call (321) 486-6414 and we'll connect you.",
   note: "Not sure of your lot size? We can help — just call us.",
 };
 
