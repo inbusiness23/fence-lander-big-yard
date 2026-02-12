@@ -130,7 +130,7 @@ export const WhyNotFreeSection = () => {
               {/* Dual CTA */}
               <div className="space-y-3">
                 <Button
-                  onClick={() => scrollTo("consultation")}
+                  onClick={() => scrollTo("consultation-form")}
                   className="w-full bg-amber-600 hover:bg-amber-700 text-white py-5 text-base font-semibold rounded-lg shadow-lg shadow-amber-600/20 transition-all duration-200 group"
                 >
                   Book Your VIP Consultation — $150
