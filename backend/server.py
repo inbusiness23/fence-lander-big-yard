@@ -457,6 +457,90 @@ async def get_admin_stats():
 # Include router
 app.include_router(api_router)
 
+
+# --- Stripe Webhook (outside /api prefix — Stripe posts directly) ---
+
+async def handle_successful_payment(session):
+    """Process a successful Stripe checkout payment"""
+    consultation_id = session.get("metadata", {}).get("consultation_id")
+    if not consultation_id:
+        logger.warning("Webhook: No consultation_id in session metadata")
+        return
+
+    now = datetime.now(timezone.utc).isoformat()
+
+    # Update consultation
+    await db.consultations.update_one(
+        {"id": consultation_id},
+        {"$set": {
+            "status": "confirmed",
+            "paymentStatus": "paid",
+            "paidAt": now,
+        }}
+    )
+
+    # Update payment transaction
+    await db.payment_transactions.update_one(
+        {"consultation_id": consultation_id},
+        {"$set": {
+            "payment_status": "paid",
+            "status": "complete",
+            "updatedAt": now,
+        }}
+    )
+
+    logger.info(f"Webhook: Consultation {consultation_id} marked as paid")
+
+    # Push updated status to GHL with Paid tag
+    consultation = await db.consultations.find_one({"id": consultation_id})
+    if consultation:
+        try:
+            ghl_data = {k: v for k, v in consultation.items() if k != "_id"}
+            ghl_data["paymentStatus"] = "PAID - $150"
+            await push_to_ghl(ghl_data, "consultation")
+            logger.info(f"Webhook: GHL updated with Paid tag for {consultation_id}")
+        except Exception as e:
+            logger.error(f"Webhook: GHL push failed for {consultation_id}: {e}")
+
+
+@app.post("/api/stripe-webhook")
+async def stripe_webhook(request: Request):
+    """Handle Stripe webhook events for real-time payment updates"""
+    payload = await request.body()
+    sig_header = request.headers.get("stripe-signature")
+
+    if STRIPE_WEBHOOK_SECRET and sig_header:
+        try:
+            event = stripe.Webhook.construct_event(
+                payload, sig_header, STRIPE_WEBHOOK_SECRET
+            )
+        except stripe.error.SignatureVerificationError:
+            logger.warning("Webhook: Invalid signature")
+            raise HTTPException(status_code=400, detail="Invalid signature")
+        except Exception as e:
+            logger.error(f"Webhook: Construction error: {e}")
+            raise HTTPException(status_code=400, detail=str(e))
+    else:
+        # No webhook secret configured — parse payload directly (dev/testing mode)
+        import json
+        try:
+            event = json.loads(payload)
+        except Exception:
+            raise HTTPException(status_code=400, detail="Invalid payload")
+
+    event_type = event.get("type", "")
+    logger.info(f"Webhook received: {event_type}")
+
+    if event_type == "checkout.session.completed":
+        session_data = event.get("data", {}).get("object", {})
+        if session_data.get("payment_status") == "paid":
+            await handle_successful_payment(session_data)
+    elif event_type == "checkout.session.async_payment_succeeded":
+        session_data = event.get("data", {}).get("object", {})
+        await handle_successful_payment(session_data)
+
+    return {"received": True}
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
