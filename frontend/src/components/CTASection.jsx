@@ -365,6 +365,7 @@ export const CTASection = () => {
                         <span className="font-semibold text-stone-700"> ASAP Fence & Gates</span> at the phone number provided above
                         regarding my fence consultation and project updates. Message frequency varies. Msg & data rates may apply.
                         Reply STOP to cancel at any time. Reply HELP for help. Consent is not a condition of purchase.
+                        View our <a href="/privacy" target="_blank" className="text-amber-700 underline">Privacy Policy</a> and <a href="/terms" target="_blank" className="text-amber-700 underline">Terms of Service</a>.
                       </label>
                     </div>
                   </div>
