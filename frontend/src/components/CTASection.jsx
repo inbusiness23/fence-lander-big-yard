@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRight, Phone, CheckCircle2, ShieldCheck, ArrowLeft, Lock, CreditCard } from "lucide-react";
+import { ArrowRight, Phone, CheckCircle2, ShieldCheck, ArrowLeft, Lock, CreditCard, AlertCircle } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -11,8 +11,10 @@ import {
   SelectValue,
 } from "./ui/select";
 import { Label } from "./ui/label";
+import { Checkbox } from "./ui/checkbox";
 import { CONSULTATION_FORM_FIELDS, COMPANY, SATISFACTION_GUARANTEE } from "../data/mock";
 import { toast } from "sonner";
+import { validateEmail } from "../lib/emailValidator";
 import axios from "axios";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -22,9 +24,42 @@ export const CTASection = () => {
   const [formData, setFormData] = useState({});
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [smsConsent, setSmsConsent] = useState(false);
+  const [emailError, setEmailError] = useState(null);
+  const [emailSuggestion, setEmailSuggestion] = useState(null);
 
   const handleChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === "email") {
+      setEmailError(null);
+      setEmailSuggestion(null);
+    }
+  };
+
+  const handleEmailBlur = () => {
+    if (!formData.email) return;
+    const result = validateEmail(formData.email);
+    if (!result.valid) {
+      if (result.suggestion) {
+        setEmailSuggestion(result.suggestion);
+        setEmailError(result.error);
+      } else {
+        setEmailError(result.error);
+        setEmailSuggestion(null);
+      }
+    } else {
+      setEmailError(null);
+      setEmailSuggestion(null);
+      if (result.email !== formData.email) {
+        handleChange("email", result.email);
+      }
+    }
+  };
+
+  const acceptEmailSuggestion = () => {
+    handleChange("email", emailSuggestion);
+    setEmailError(null);
+    setEmailSuggestion(null);
   };
 
   const handleStep1Submit = (e) => {
@@ -35,6 +70,20 @@ export const CTASection = () => {
       toast.error(`Please fill in: ${missing.map((f) => f.label).join(", ")}`);
       return;
     }
+
+    // Validate email
+    const emailResult = validateEmail(formData.email);
+    if (!emailResult.valid) {
+      if (emailResult.suggestion) {
+        setEmailSuggestion(emailResult.suggestion);
+        setEmailError(emailResult.error);
+      } else {
+        setEmailError(emailResult.error);
+      }
+      toast.error("Please check your email address");
+      return;
+    }
+
     setStep(2);
     document.getElementById("consultation-form")?.scrollIntoView({ behavior: "smooth" });
   };
@@ -44,6 +93,8 @@ export const CTASection = () => {
     try {
       const response = await axios.post(`${API}/consultations`, {
         ...formData,
+        smsConsent,
+        smsConsentTimestamp: smsConsent ? new Date().toISOString() : null,
         originUrl: window.location.origin,
       });
 
