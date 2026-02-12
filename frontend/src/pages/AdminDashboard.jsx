@@ -134,10 +134,15 @@ export default function AdminDashboard() {
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 text-sm">
-                      <div>
-                        <span className="text-stone-400 block text-xs">Phone</span>
-                        <span className="text-stone-700 font-medium">{lead.phone}</span>
-                      </div>
+                      {lead.phone && (
+                        <div>
+                          <span className="text-stone-400 block text-xs">Phone</span>
+                          <span className="text-stone-700 font-medium">{lead.phone}</span>
+                          {lead.smsConsent && (
+                            <span className="inline-block mt-0.5 text-[10px] text-emerald-600 font-medium">SMS opted in</span>
+                          )}
+                        </div>
+                      )}
                       <div>
                         <span className="text-stone-400 block text-xs">Email</span>
                         <span className="text-stone-700 break-all">{lead.email}</span>
