@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRight, Send, Phone, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Send, Phone, CheckCircle2, ShieldCheck } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
