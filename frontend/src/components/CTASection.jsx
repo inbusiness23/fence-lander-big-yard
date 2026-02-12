@@ -229,7 +229,7 @@ export const CTASection = () => {
             </Button>
 
             <p className="text-center text-stone-400 text-xs mt-4">
-              No spam. No obligation. Your information is kept strictly confidential.
+              $150 consultation fee is fully credited toward your project. No spam. No obligation.
             </p>
           </form>
         </div>
