@@ -413,10 +413,17 @@ export const CTASection = () => {
                       <span className="text-stone-400 block text-xs">Email</span>
                       <span className="text-stone-800 font-medium break-all">{formData.email}</span>
                     </div>
-                    <div>
-                      <span className="text-stone-400 block text-xs">Phone</span>
-                      <span className="text-stone-800 font-medium">{formData.phone}</span>
-                    </div>
+                    {formData.phone && (
+                      <div>
+                        <span className="text-stone-400 block text-xs">Phone</span>
+                        <span className="text-stone-800 font-medium">{formData.phone}</span>
+                        {smsConsent && (
+                          <span className="inline-flex items-center gap-1 mt-1 text-[10px] text-emerald-600 font-medium">
+                            <CheckCircle2 className="w-3 h-3" /> SMS opted in
+                          </span>
+                        )}
+                      </div>
+                    )}
                     <div>
                       <span className="text-stone-400 block text-xs">Property</span>
                       <span className="text-stone-800 font-medium break-words">{formData.address}</span>
