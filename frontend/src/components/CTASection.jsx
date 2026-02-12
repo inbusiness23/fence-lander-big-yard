@@ -92,13 +92,24 @@ export const CTASection = () => {
               className="text-3xl sm:text-4xl font-bold text-white mb-5"
               style={{ fontFamily: "'Playfair Display', serif" }}
             >
-              Schedule Your VIP Consultation
+              Book Your VIP Consultation
             </h2>
-            <p className="text-stone-400 text-lg leading-relaxed mb-10">
+            <p className="text-stone-400 text-lg leading-relaxed mb-6">
               Fill out the form and your dedicated project manager will contact you
-              within 24 hours. No obligation, no pressure — just a genuine
-              conversation about your property.
+              within hours to schedule your on-site visit — typically the same day or next business day.
             </p>
+
+            {/* $150 Fee Box */}
+            <div className="p-5 rounded-xl bg-amber-500/10 border border-amber-500/20 mb-8">
+              <div className="flex items-baseline gap-2 mb-2">
+                <span className="text-3xl font-bold text-amber-300" style={{ fontFamily: "'Playfair Display', serif" }}>$150</span>
+                <span className="text-amber-400/80 text-sm font-medium">VIP Consultation Fee</span>
+              </div>
+              <p className="text-stone-400 text-sm leading-relaxed">
+                Your $150 is <span className="text-amber-300 font-semibold">credited in full</span> toward your fence installation. 
+                It's our way of ensuring we dedicate real time and resources to your property.
+              </p>
+            </div>
 
             {/* Benefits */}
             <div className="space-y-5 mb-10">
