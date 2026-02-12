@@ -1,5 +1,3 @@
-import { Shield, Clock, UserCheck, Ruler, Phone, Mail, MapPin, Star, ChevronRight, Fence, TreePine, Home, Award, Sparkles, CalendarCheck, Wrench, MessageSquare, CheckCircle2 } from "lucide-react";
-
 export const COMPANY = {
   name: "ASAP Fence & Gates",
   division: "Large Yard Division",
@@ -7,33 +5,25 @@ export const COMPANY = {
   email: "vip@asapfencegates.com",
   address: "Seminole County, Florida",
   tagline: "Premium Fencing for Exceptional Properties",
+  appointmentFee: 150,
 };
 
 export const HERO = {
   headline: "Your Large Yard Deserves\nMore Than a Contractor.",
   subheadline: "It Deserves a Partner.",
   description: "ASAP Fence & Gates' Large Yard Division exists for one reason — to give Seminole County homeowners with significant properties the dedicated attention, premium craftsmanship, and white-glove service their investment demands.",
-  ctaPrimary: "Schedule Your VIP Consultation",
+  ctaPrimary: "Book Your VIP Consultation — $150",
   ctaSecondary: "Call Us Directly",
-  image: "https://images.unsplash.com/photo-1694885143361-0214e13387f5?w=1200&auto=format&fit=crop&q=80",
+  image: "https://images.unsplash.com/photo-1740482682683-309e6fb4898f?w=1400&auto=format&fit=crop&q=80",
 };
 
 export const YARD_SIZES = [
-  {
-    id: "standard",
-    label: "Standard Yard",
-    size: "Under ¼ Acre",
-    budget: "Under $5,000",
-    description: "Great for typical residential lots",
-    recommended: false,
-    message: "Our standard division can help — call (407) 555-0180",
-  },
   {
     id: "large",
     label: "Large Yard",
     size: "¼ – ¾ Acre",
     budget: "$7,500 – $15,000",
-    description: "Perfect for spacious Seminole County properties",
+    description: "Perfect for spacious Seminole County properties. Your dedicated project manager handles every detail.",
     recommended: true,
     message: "You're in the right place. Let's get started.",
   },
@@ -42,11 +32,17 @@ export const YARD_SIZES = [
     label: "Estate Property",
     size: "¾ Acre+",
     budget: "$15,000+",
-    description: "Custom solutions for estate-level properties",
+    description: "Custom solutions for estate-level properties. Our most experienced crews and premium material selection.",
     recommended: true,
     message: "Our VIP team specializes in projects like yours.",
   },
 ];
+
+export const DISQUALIFY_MESSAGE = {
+  title: "This Division Is Exclusively for Large Properties",
+  description: "Our Large Yard Division is reserved for Seminole County homeowners with ¼ acre or more. For properties under ¼ acre, our standard team provides excellent service — call (407) 555-0180 to reach them directly.",
+  note: "Not sure of your lot size? We can help — just call us.",
+};
 
 export const VALUE_PROPS = [
   {
@@ -56,8 +52,8 @@ export const VALUE_PROPS = [
   },
   {
     icon: "Clock",
-    title: "We Respect Your Time",
-    description: "Guaranteed same-week estimates, on-time crews, and proactive updates so you're never left wondering what's happening with your project.",
+    title: "Same-Day & Next-Day Consultations",
+    description: "VIP consultations are typically scheduled the same day or next business day. We come to your property, assess your needs, and discuss your vision — fast.",
   },
   {
     icon: "Shield",
@@ -71,32 +67,104 @@ export const VALUE_PROPS = [
   },
 ];
 
-export const SERVICES = [
+export const FENCE_STYLES = [
   {
-    title: "New Fence Installation",
-    description: "From property survey to final inspection, we handle every detail of your new fence installation with precision and care.",
-    image: "https://images.unsplash.com/photo-1722293742416-4380f2987a61?w=600&auto=format&fit=crop&q=80",
-    features: ["Custom design consultation", "Professional property survey", "Permit handling", "Expert installation", "Final walkthrough"],
+    title: "Cedar Fence",
+    shortDesc: "Natural beauty with timeless warmth",
+    description: "Premium cedar fencing brings natural elegance to your Central Florida property. Naturally resistant to insects and rot, cedar weathers beautifully in our subtropical climate.",
+    image: "https://images.unsplash.com/photo-1748908271592-d9d5690b288b?w=600&auto=format&fit=crop&q=80",
+    features: ["Natural insect resistance", "Beautiful grain patterns", "Weathers to silver-grey patina", "Custom height options"],
   },
   {
-    title: "Fence Replacement",
-    description: "Upgrade your existing fence with modern materials and superior craftsmanship. We remove the old and install the new seamlessly.",
-    image: "https://images.unsplash.com/photo-1702083560652-223096493bc4?w=600&auto=format&fit=crop&q=80",
-    features: ["Full removal & disposal", "Foundation assessment", "Material upgrade options", "Code-compliant installation", "Cleanup guarantee"],
+    title: "Pressure-Treated Pine",
+    shortDesc: "Affordable durability for large yards",
+    description: "Pressure-treated pine delivers solid fencing at an exceptional value. Treated to resist Florida's moisture and termites, it's the smart choice for large properties.",
+    image: "https://images.unsplash.com/photo-1673967683504-d23d3ab5b011?w=600&auto=format&fit=crop&q=80",
+    features: ["Termite & rot treated", "Cost-effective for large runs", "Paintable & stainable", "Strong structural integrity"],
   },
   {
-    title: "Premium Materials",
-    description: "Choose from our curated selection of commercial-grade fencing materials built to withstand Florida's demanding climate.",
-    image: "https://images.unsplash.com/photo-1619322704995-5215d5f47a75?w=600&auto=format&fit=crop&q=80",
-    features: ["Cedar & pressure-treated wood", "Vinyl privacy fencing", "Ornamental aluminum", "Custom gates & hardware", "Hurricane-rated options"],
+    title: "3-Rail Black Aluminum",
+    shortDesc: "4ft flat top with rake bottom",
+    description: "Elegant three-rail black aluminum fencing at 4-foot height with flat top and rake bottom styling. Zero maintenance and built to withstand Florida's elements for decades.",
+    image: "https://images.unsplash.com/photo-1752606303028-58f35d05dad5?w=600&auto=format&fit=crop&q=80",
+    features: ["Flat top & rake bottom", "4ft standard height", "Zero maintenance", "Lifetime warranty on finish"],
   },
+  {
+    title: "White Vinyl Privacy",
+    shortDesc: "6ft modern rail, total privacy",
+    description: "Six-foot white vinyl privacy fencing with sleek modern rails. The clean, contemporary look that Central Florida homeowners love — with zero painting or staining, ever.",
+    image: "https://images.unsplash.com/photo-1744701752665-6d94c9c841e2?w=600&auto=format&fit=crop&q=80",
+    features: ["6ft privacy height", "Modern rail design", "UV-resistant white finish", "Lifetime vinyl warranty"],
+  },
+  {
+    title: "Black Vinyl Chain Link",
+    shortDesc: '6\'8" coated for durability',
+    description: "Black vinyl-coated chain link at 6-foot-8 height delivers serious security with a refined look. The vinyl coating protects against Florida's salt air and UV exposure.",
+    image: "https://images.unsplash.com/photo-1707178337303-dd825f603a3e?w=600&auto=format&fit=crop&q=80",
+    features: ["6'8\" height for security", "Black vinyl coating", "Corrosion resistant", "Commercial-grade mesh"],
+  },
+  {
+    title: "DuraFence",
+    shortDesc: "Next-gen composite fencing",
+    description: "DuraFence composite panels combine the beauty of wood with the longevity of engineered materials. Won't warp, crack, or fade — even in Florida's demanding climate.",
+    image: "https://images.unsplash.com/photo-1770044001594-0c59c6fe83c0?w=600&auto=format&fit=crop&q=80",
+    features: ["Wood-look composite", "Won't warp or crack", "Fade-resistant finish", "25-year manufacturer warranty"],
+  },
+];
+
+export const BEFORE_AFTER = [
+  {
+    id: 1,
+    label: "Morning Light Transformation",
+    before: {
+      image: "https://images.unsplash.com/photo-1769690177043-c28ce822a4f7?w=600&auto=format&fit=crop&q=80",
+      caption: "Before: Overgrown, deteriorating fence line",
+    },
+    after: {
+      image: "https://images.unsplash.com/photo-1681853108586-f29b4ef5c0fb?w=600&auto=format&fit=crop&q=80",
+      caption: "After: Clean, professional cedar installation",
+    },
+  },
+  {
+    id: 2,
+    label: "Golden Hour Finish",
+    before: {
+      image: "https://images.unsplash.com/photo-1761551022779-1b09f0762297?w=600&auto=format&fit=crop&q=80",
+      caption: "Before: Open, unsecured yard boundary",
+    },
+    after: {
+      image: "https://images.unsplash.com/photo-1621271697043-8f80216904e1?w=600&auto=format&fit=crop&q=80",
+      caption: "After: White vinyl privacy, complete enclosure",
+    },
+  },
+  {
+    id: 3,
+    label: "Sunset Showcase",
+    before: {
+      image: "https://images.unsplash.com/photo-1722480419960-39017e2087a6?w=600&auto=format&fit=crop&q=80",
+      caption: "Before: Dated fencing, no curb appeal",
+    },
+    after: {
+      image: "https://images.unsplash.com/photo-1621271718730-9976bf75a23d?w=600&auto=format&fit=crop&q=80",
+      caption: "After: Aluminum fence at sunset, elegant lines",
+    },
+  },
+];
+
+export const FEATURED_IN = [
+  { name: "Orlando Sentinel", type: "newspaper" },
+  { name: "Seminole Chronicle", type: "newspaper" },
+  { name: "WESH 2 News", type: "tv" },
+  { name: "Central Florida Lifestyle", type: "magazine" },
+  { name: "Sanford Herald", type: "newspaper" },
+  { name: "Orlando Home & Garden", type: "magazine" },
 ];
 
 export const PROCESS_STEPS = [
   {
     step: 1,
-    title: "Schedule Your Consultation",
-    description: "Book a time that works for you. We come to your property, assess your needs, and discuss your vision — all within the same week.",
+    title: "Book Your VIP Consultation",
+    description: "Schedule online for $150 (credited toward your project). We'll be at your property the same day or next business day to assess your needs.",
     icon: "CalendarCheck",
   },
   {
@@ -146,23 +214,23 @@ export const TESTIMONIALS = [
 export const FAQ_ITEMS = [
   {
     question: "What makes the Large Yard Division different from your standard service?",
-    answer: "Our Large Yard Division is a dedicated team that exclusively handles properties ¼ acre and above. You get a personal project manager, priority scheduling, commercial-grade materials, and the focused attention that larger projects demand. We limit our active projects so your fence gets the care it deserves.",
+    answer: "Our Large Yard Division is a dedicated team that exclusively handles properties ¼ acre and above. You get a personal project manager, priority scheduling with same-day or next-day consultations, commercial-grade materials, and the focused attention that larger projects demand. We limit our active projects so your fence gets the care it deserves.",
+  },
+  {
+    question: "Why is there a $150 consultation fee?",
+    answer: "The $150 VIP consultation fee ensures we dedicate serious time and resources to your property — including a thorough on-site assessment, material samples, and a custom proposal within 48 hours. It also ensures we're meeting with homeowners who are genuinely ready to invest in their property. The full $150 is credited directly toward your project when you move forward.",
   },
   {
     question: "How quickly can you start my project?",
-    answer: "We offer same-week consultations and typically begin installation within 2-3 weeks of proposal approval. For urgent projects, ask about our priority scheduling — we'll do everything we can to accommodate your timeline.",
+    answer: "VIP consultations are typically same-day or next business day. After proposal approval, we typically begin installation within 2-3 weeks. For urgent projects, ask about our priority scheduling — we'll do everything we can to accommodate your timeline.",
   },
   {
     question: "Do you handle permits in Seminole County?",
     answer: "Absolutely. We handle 100% of the permitting process with Seminole County. Our team knows the local codes inside and out, so there are no surprises or delays. It's one less thing you have to think about.",
   },
   {
-    question: "What's included in the consultation?",
-    answer: "Your consultation includes a thorough property assessment, measurement of your fence line, discussion of material options and styles, and a review of any HOA requirements. We bring samples so you can see and feel the materials. There's zero obligation and zero pressure.",
-  },
-  {
     question: "What kind of warranty do you offer?",
-    answer: "Every Large Yard Division project includes our comprehensive warranty: lifetime warranty on vinyl, 10-year warranty on wood craftsmanship, and 20-year warranty on aluminum. We also offer a 1-year workmanship guarantee on all labor.",
+    answer: "Warranty varies by material: lifetime warranty on vinyl fencing, lifetime finish warranty on aluminum, 25-year manufacturer warranty on DuraFence composite, and 20-year warranty on vinyl-coated chain link. All projects include a 1-year workmanship guarantee on labor. Note: wood fencing (cedar and pressure-treated pine) is not covered by a material warranty due to the natural characteristics of wood, though our workmanship guarantee still applies.",
   },
   {
     question: "Can you work with my HOA requirements?",
@@ -177,6 +245,7 @@ export const CONSULTATION_FORM_FIELDS = [
   { name: "address", label: "Property Address", type: "text", placeholder: "Your property address in Seminole County", required: true },
   { name: "yardSize", label: "Estimated Yard Size", type: "select", options: ["¼ – ½ Acre", "½ – ¾ Acre", "¾ – 1 Acre", "1+ Acre"], required: true },
   { name: "projectType", label: "Project Type", type: "select", options: ["New Fence Installation", "Fence Replacement", "Both — Replace & Extend"], required: true },
+  { name: "fenceStyle", label: "Preferred Fence Style", type: "select", options: ["Cedar", "Pressure-Treated Pine", "3-Rail Black Aluminum", "White Vinyl Privacy", "Black Vinyl Chain Link", "DuraFence Composite", "Not sure — need guidance"], required: false },
   { name: "timeline", label: "Preferred Timeline", type: "select", options: ["As soon as possible", "Within 1 month", "Within 2-3 months", "Just exploring options"], required: false },
   { name: "message", label: "Tell Us About Your Project", type: "textarea", placeholder: "Any details about your property, preferences, or questions...", required: false },
 ];
