@@ -8,16 +8,16 @@ export const WhyNotFreeSection = () => {
   };
 
   return (
-    <section className="py-24 bg-stone-900" id="why-150">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+    <section className="py-16 sm:py-24 bg-stone-900" id="why-150">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-start">
           {/* Left - The Argument */}
           <div>
             <span className="inline-block text-amber-400 text-sm font-semibold uppercase tracking-[0.15em] mb-5">
               The $150 Question
             </span>
             <h2
-              className="text-3xl sm:text-4xl font-bold text-white mb-6 leading-tight"
+              className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-6 leading-tight"
               style={{ fontFamily: "'Playfair Display', serif" }}
             >
               "Why Should I Pay When Everyone Else Gives Free Estimates?"
