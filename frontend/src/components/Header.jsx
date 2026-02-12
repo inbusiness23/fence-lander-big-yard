@@ -50,7 +50,7 @@ export const Header = () => {
           </div>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden lg:flex items-center gap-7">
             {["Why Us", "Services", "Process", "Testimonials", "FAQ"].map((item) => (
               <button
                 key={item}
@@ -64,22 +64,24 @@ export const Header = () => {
             ))}
           </nav>
 
-          {/* CTA */}
-          <div className="hidden md:flex items-center gap-4">
+          {/* Right CTAs - Phone + Book */}
+          <div className="hidden md:flex items-center gap-3">
             <a
-              href={`tel:${COMPANY.phone}`}
-              className={`flex items-center gap-2 text-sm font-medium transition-colors duration-200 ${
-                scrolled ? "text-stone-600" : "text-white/90"
+              href={`tel:${COMPANY.phone.replace(/[^0-9]/g, "")}`}
+              className={`flex items-center gap-2.5 px-5 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200 ${
+                scrolled
+                  ? "bg-stone-900 text-white hover:bg-stone-800 shadow-lg shadow-stone-900/15"
+                  : "bg-white/15 backdrop-blur-sm text-white border border-white/20 hover:bg-white/25"
               }`}
             >
               <Phone className="w-4 h-4" />
-              {COMPANY.phone}
+              <span>Call {COMPANY.phone}</span>
             </a>
             <Button
               onClick={() => scrollTo("consultation")}
-              className="bg-amber-700 hover:bg-amber-800 text-white px-5 py-2.5 text-sm font-semibold rounded-lg shadow-lg shadow-amber-700/20 transition-all duration-200 hover:shadow-amber-800/30"
+              className="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 text-sm font-semibold rounded-lg shadow-lg shadow-amber-600/20 transition-all duration-200 hover:shadow-amber-700/30"
             >
-              Get Your Estimate
+              Book VIP Consultation
             </Button>
           </div>
 
@@ -110,17 +112,17 @@ export const Header = () => {
             ))}
             <div className="pt-4 border-t border-stone-100 space-y-3">
               <a
-                href={`tel:${COMPANY.phone}`}
-                className="flex items-center gap-2 text-stone-600 font-medium"
+                href={`tel:${COMPANY.phone.replace(/[^0-9]/g, "")}`}
+                className="flex items-center justify-center gap-2 bg-stone-900 text-white font-semibold py-3 rounded-lg w-full"
               >
                 <Phone className="w-4 h-4" />
-                {COMPANY.phone}
+                Call {COMPANY.phone}
               </a>
               <Button
                 onClick={() => scrollTo("consultation")}
-                className="w-full bg-amber-700 hover:bg-amber-800 text-white font-semibold rounded-lg"
+                className="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg"
               >
-                Get Your Estimate
+                Book VIP Consultation
               </Button>
             </div>
           </div>
