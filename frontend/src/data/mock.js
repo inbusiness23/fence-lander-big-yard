@@ -9,12 +9,12 @@ export const COMPANY = {
 };
 
 export const HERO = {
-  headline: "Your Large Yard Deserves\nMore Than a Contractor.",
-  subheadline: "It Deserves a Partner.",
-  description: "ASAP Fence & Gates' Large Yard Division exists for one reason — to give Seminole County homeowners with significant properties the dedicated attention, premium craftsmanship, and white-glove service their investment demands.",
-  ctaPrimary: "Book Your VIP Consultation — $150",
+  headline: "The Only Fence Contractor\nBuilt for Large Yards.",
+  subheadline: "Dedicated. Premium. Yours.",
+  description: "ASAP Fence & Gates' Large Yard Division exists for one reason — to give Seminole County homeowners with significant properties the dedicated attention, premium craftsmanship, and white-glove service their fence investment demands.",
+  ctaPrimary: "Book Your VIP Fence Consultation — $150",
   ctaSecondary: "Call Us Directly",
-  image: "https://images.unsplash.com/photo-1740482682683-309e6fb4898f?w=1400&auto=format&fit=crop&q=80",
+  image: "/images/fences/white_vinyl.png",
 };
 
 export const YARD_SIZES = [
@@ -69,87 +69,59 @@ export const VALUE_PROPS = [
 
 export const FENCE_STYLES = [
   {
+    title: "White Vinyl Privacy",
+    shortDesc: "6ft modern rail, total privacy",
+    description: "Six-foot white vinyl privacy fencing with sleek modern rails. The clean, contemporary look that Central Florida homeowners love — with zero painting or staining, ever.",
+    image: "/images/fences/white_vinyl.png",
+    features: ["6ft privacy height", "Modern rail design", "UV-resistant white finish", "Lifetime vinyl warranty"],
+  },
+  {
+    title: "3-Rail Black Aluminum",
+    shortDesc: "Flat top with rake bottom",
+    description: "Elegant three-rail black aluminum fencing with flat top and rake bottom styling. Zero maintenance and built to withstand Florida's elements for decades.",
+    image: "/images/fences/black_aluminum.png",
+    features: ["Flat top & rake bottom", "Three-rail design", "Zero maintenance", "Lifetime warranty on finish"],
+  },
+  {
     title: "Cedar Fence",
     shortDesc: "Natural beauty with timeless warmth",
     description: "Premium cedar fencing brings natural elegance to your Central Florida property. Naturally resistant to insects and rot, cedar weathers beautifully in our subtropical climate.",
-    image: "https://images.unsplash.com/photo-1748908271592-d9d5690b288b?w=600&auto=format&fit=crop&q=80",
+    image: "/images/fences/cedar.png",
     features: ["Natural insect resistance", "Beautiful grain patterns", "Weathers to silver-grey patina", "Custom height options"],
   },
   {
     title: "Pressure-Treated Pine",
     shortDesc: "Affordable durability for large yards",
     description: "Pressure-treated pine delivers solid fencing at an exceptional value. Treated to resist Florida's moisture and termites, it's the smart choice for large properties.",
-    image: "https://images.unsplash.com/photo-1673967683504-d23d3ab5b011?w=600&auto=format&fit=crop&q=80",
+    image: "/images/fences/pressure_treated_pine.png",
     features: ["Termite & rot treated", "Cost-effective for large runs", "Paintable & stainable", "Strong structural integrity"],
   },
   {
-    title: "3-Rail Black Aluminum",
-    shortDesc: "4ft flat top with rake bottom",
-    description: "Elegant three-rail black aluminum fencing at 4-foot height with flat top and rake bottom styling. Zero maintenance and built to withstand Florida's elements for decades.",
-    image: "https://images.unsplash.com/photo-1752606303028-58f35d05dad5?w=600&auto=format&fit=crop&q=80",
-    features: ["Flat top & rake bottom", "4ft standard height", "Zero maintenance", "Lifetime warranty on finish"],
-  },
-  {
-    title: "White Vinyl Privacy",
-    shortDesc: "6ft modern rail, total privacy",
-    description: "Six-foot white vinyl privacy fencing with sleek modern rails. The clean, contemporary look that Central Florida homeowners love — with zero painting or staining, ever.",
-    image: "https://images.unsplash.com/photo-1744701752665-6d94c9c841e2?w=600&auto=format&fit=crop&q=80",
-    features: ["6ft privacy height", "Modern rail design", "UV-resistant white finish", "Lifetime vinyl warranty"],
-  },
-  {
     title: "Black Vinyl Chain Link",
-    shortDesc: '6\'8" coated for durability',
-    description: "Black vinyl-coated chain link at 6-foot-8 height delivers serious security with a refined look. The vinyl coating protects against Florida's salt air and UV exposure.",
-    image: "https://images.unsplash.com/photo-1707178337303-dd825f603a3e?w=600&auto=format&fit=crop&q=80",
-    features: ["6'8\" height for security", "Black vinyl coating", "Corrosion resistant", "Commercial-grade mesh"],
+    shortDesc: "Coated for durability & security",
+    description: "Black vinyl-coated chain link delivers serious security with a refined look. The vinyl coating protects against Florida's salt air and UV exposure. Available in all heights.",
+    image: "/images/fences/chain_link.png",
+    features: ["Available in all heights", "Black vinyl coating", "Corrosion resistant", "Commercial-grade mesh"],
   },
   {
     title: "DuraFence",
     shortDesc: "Next-gen composite fencing",
     description: "DuraFence composite panels combine the beauty of wood with the longevity of engineered materials. Won't warp, crack, or fade — even in Florida's demanding climate.",
-    image: "https://images.unsplash.com/photo-1770044001594-0c59c6fe83c0?w=600&auto=format&fit=crop&q=80",
+    image: "/images/fences/durafence.png",
     features: ["Wood-look composite", "Won't warp or crack", "Fade-resistant finish", "25-year manufacturer warranty"],
   },
 ];
 
-export const BEFORE_AFTER = [
-  {
-    id: 1,
-    label: "Morning Light Transformation",
-    before: {
-      image: "https://images.unsplash.com/photo-1769690177043-c28ce822a4f7?w=600&auto=format&fit=crop&q=80",
-      caption: "Before: Overgrown, deteriorating fence line",
-    },
-    after: {
-      image: "https://images.unsplash.com/photo-1681853108586-f29b4ef5c0fb?w=600&auto=format&fit=crop&q=80",
-      caption: "After: Clean, professional cedar installation",
-    },
+export const BEFORE_AFTER = {
+  before: {
+    image: "/images/fences/before_1.png",
+    caption: "Before: Deteriorating fence, overgrown yard boundary",
   },
-  {
-    id: 2,
-    label: "Golden Hour Finish",
-    before: {
-      image: "https://images.unsplash.com/photo-1761551022779-1b09f0762297?w=600&auto=format&fit=crop&q=80",
-      caption: "Before: Open, unsecured yard boundary",
-    },
-    after: {
-      image: "https://images.unsplash.com/photo-1621271697043-8f80216904e1?w=600&auto=format&fit=crop&q=80",
-      caption: "After: White vinyl privacy, complete enclosure",
-    },
+  after: {
+    image: "/images/fences/after_1.png",
+    caption: "After: Brand new vinyl privacy fence, clean professional installation",
   },
-  {
-    id: 3,
-    label: "Sunset Showcase",
-    before: {
-      image: "https://images.unsplash.com/photo-1722480419960-39017e2087a6?w=600&auto=format&fit=crop&q=80",
-      caption: "Before: Dated fencing, no curb appeal",
-    },
-    after: {
-      image: "https://images.unsplash.com/photo-1621271718730-9976bf75a23d?w=600&auto=format&fit=crop&q=80",
-      caption: "After: Aluminum fence at sunset, elegant lines",
-    },
-  },
-];
+};
 
 export const FEATURED_IN = [
   { name: "Orlando Sentinel", type: "newspaper" },
@@ -218,7 +190,11 @@ export const FAQ_ITEMS = [
   },
   {
     question: "Why is there a $150 consultation fee?",
-    answer: "The $150 VIP consultation fee ensures we dedicate serious time and resources to your property — including a thorough on-site assessment, material samples, and a custom proposal within 48 hours. It also ensures we're meeting with homeowners who are genuinely ready to invest in their property. The full $150 is credited directly toward your project when you move forward.",
+    answer: "The $150 VIP consultation fee ensures we dedicate serious time and resources to your property — including a thorough on-site assessment, material samples, and a custom proposal within 48 hours. It filters out casual inquiries so we can give real buyers like you our full, undivided attention. When you move forward, the entire $150 is credited toward your fence project — so it costs you nothing.",
+  },
+  {
+    question: "Do you offer financing or pay-over-time options?",
+    answer: "Yes! We partner with trusted financing providers so you can spread your fence investment over time. Most homeowners are approved quickly with competitive rates. Your project manager will walk you through available options during your consultation — there's no obligation to apply.",
   },
   {
     question: "How quickly can you start my project?",
@@ -245,7 +221,7 @@ export const CONSULTATION_FORM_FIELDS = [
   { name: "address", label: "Property Address", type: "text", placeholder: "Your property address in Seminole County", required: true },
   { name: "yardSize", label: "Estimated Yard Size", type: "select", options: ["¼ – ½ Acre", "½ – ¾ Acre", "¾ – 1 Acre", "1+ Acre"], required: true },
   { name: "projectType", label: "Project Type", type: "select", options: ["New Fence Installation", "Fence Replacement", "Both — Replace & Extend"], required: true },
-  { name: "fenceStyle", label: "Preferred Fence Style", type: "select", options: ["Cedar", "Pressure-Treated Pine", "3-Rail Black Aluminum", "White Vinyl Privacy", "Black Vinyl Chain Link", "DuraFence Composite", "Not sure — need guidance"], required: false },
+  { name: "fenceStyle", label: "Preferred Fence Style", type: "select", options: ["White Vinyl Privacy", "3-Rail Black Aluminum", "Cedar", "Pressure-Treated Pine", "Black Vinyl Chain Link", "DuraFence Composite", "Not sure — need guidance"], required: false },
   { name: "timeline", label: "Preferred Timeline", type: "select", options: ["As soon as possible", "Within 1 month", "Within 2-3 months", "Just exploring options"], required: false },
   { name: "message", label: "Tell Us About Your Project", type: "textarea", placeholder: "Any details about your property, preferences, or questions...", required: false },
 ];
