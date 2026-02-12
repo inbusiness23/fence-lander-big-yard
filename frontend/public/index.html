@@ -176,5 +176,15 @@
                 },
             });
         </script>
+        <script>
+            (function() {
+                var badge = document.getElementById('emergent-badge');
+                if (badge) badge.style.setProperty('display', 'none', 'important');
+                new MutationObserver(function() {
+                    var b = document.getElementById('emergent-badge');
+                    if (b) b.style.setProperty('display', 'none', 'important');
+                }).observe(document.body, { childList: true, subtree: true });
+            })();
+        </script>
     </body>
 </html>
