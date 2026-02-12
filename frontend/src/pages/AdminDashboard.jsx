@@ -47,7 +47,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div data-testid="admin-dashboard" className="min-h-screen bg-stone-50">
       {/* Header */}
       <div className="bg-stone-900 border-b border-stone-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center justify-between">
@@ -58,7 +58,7 @@ export default function AdminDashboard() {
             <p className="text-amber-400 text-xs font-semibold uppercase tracking-wider">Lead Dashboard</p>
           </div>
           <div className="flex items-center gap-3">
-            <Button onClick={fetchData} variant="outline" className="border-stone-600 text-stone-300 hover:bg-stone-800 hover:text-white text-sm">
+            <Button data-testid="admin-refresh-btn" onClick={fetchData} variant="outline" className="border-stone-600 text-stone-300 hover:bg-stone-800 hover:text-white text-sm">
               Refresh
             </Button>
             <a href="/">
