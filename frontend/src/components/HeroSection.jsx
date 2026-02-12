@@ -33,9 +33,13 @@ export const HeroSection = () => {
       toast.error("Please enter your phone number");
       return;
     }
-    const callbacks = JSON.parse(localStorage.getItem("callbacks") || "[]");
-    callbacks.push({ name: callbackName, phone: callbackPhone, timestamp: new Date().toISOString() });
-    localStorage.setItem("callbacks", JSON.stringify(callbacks));
+    try {
+      await axios.post(`${API}/callbacks`, { name: callbackName, phone: callbackPhone });
+    } catch (err) {
+      const callbacks = JSON.parse(localStorage.getItem("callbacks") || "[]");
+      callbacks.push({ name: callbackName, phone: callbackPhone, timestamp: new Date().toISOString() });
+      localStorage.setItem("callbacks", JSON.stringify(callbacks));
+    }
     setCallbackSent(true);
     toast.success("We'll call you shortly!");
   };
