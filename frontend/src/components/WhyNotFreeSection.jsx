@@ -10,7 +10,7 @@ export const WhyNotFreeSection = () => {
   return (
     <section className="py-24 bg-stone-900" id="why-150">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
           {/* Left - The Argument */}
           <div>
             <span className="inline-block text-amber-400 text-sm font-semibold uppercase tracking-[0.15em] mb-5">
