@@ -67,7 +67,7 @@ export const WhyChooseUs = () => {
             "500+ Large Yard Projects",
             "15+ Years in Seminole County",
             "Avg. 4.9★ Rating",
-            "Same-Week Estimates",
+            "Same-Day Consultations",
           ].map((stat) => (
             <div key={stat} className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
