@@ -57,13 +57,15 @@ class StatusCheckCreate(BaseModel):
 class ConsultationCreate(BaseModel):
     fullName: str
     email: str
-    phone: str
+    phone: Optional[str] = None
     address: str
     yardSize: str
     projectType: str
     fenceStyle: Optional[str] = None
     timeline: Optional[str] = None
     message: Optional[str] = None
+    smsConsent: bool = False
+    smsConsentTimestamp: Optional[str] = None
     originUrl: str
 
 class CallbackCreate(BaseModel):
