@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, Request, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -8,12 +8,9 @@ from pathlib import Path
 from pydantic import BaseModel, Field
 from typing import List, Optional
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 import stripe
 import httpx
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -32,8 +29,10 @@ GHL_API_KEY = os.environ.get('GHL_API_KEY')
 GHL_LOCATION_ID = os.environ.get('GHL_LOCATION_ID')
 GHL_BASE_URL = "https://services.leadconnectorhq.com"
 
-# Email
-NOTIFICATION_EMAIL = os.environ.get('NOTIFICATION_EMAIL', 'info@asapfenceandgate.com')
+# GHL Lead Source Identifier — used for routing inside GHL workflows
+GHL_LEAD_SOURCE = "ASAP Large Yard LP"
+GHL_CONSULTATION_TAG = "LP-VIP-Consultation"
+GHL_CALLBACK_TAG = "LP-Callback-Request"
 
 # Create the main app
 app = FastAPI()
@@ -43,12 +42,12 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 logger = logging.getLogger(__name__)
 
 
-# ─── Models ───────────────────────────────────────────────────────────────────
+# --- Models ---
 
 class StatusCheck(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     client_name: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class StatusCheckCreate(BaseModel):
     client_name: str
@@ -70,30 +69,35 @@ class CallbackCreate(BaseModel):
     phone: str
 
 
-# ─── GHL Integration ─────────────────────────────────────────────────────────
+# --- GHL Integration ---
 
 async def push_to_ghl(data: dict, lead_type: str = "consultation"):
-    """Push a lead to Go High Level CRM"""
+    """Push a lead to Go High Level CRM with clear routing identifiers"""
     if not GHL_API_KEY or not GHL_LOCATION_ID:
         logger.warning("GHL credentials not configured, skipping push")
         return None
 
     try:
-        # Split name
         name_parts = data.get("fullName", "").split(" ", 1)
         first_name = name_parts[0] if name_parts else ""
         last_name = name_parts[1] if len(name_parts) > 1 else ""
 
-        # Build tags
-        tags = ["Large Yard Division", "VIP Consultation", f"Source: Landing Page"]
+        # Routing tags — GHL_CONSULTATION_TAG is the primary routing identifier
+        tags = [
+            GHL_CONSULTATION_TAG,
+            GHL_LEAD_SOURCE,
+            "Large Yard Division",
+        ]
         if data.get("yardSize"):
             tags.append(f"Yard: {data['yardSize']}")
         if data.get("fenceStyle"):
             tags.append(f"Style: {data['fenceStyle']}")
         if data.get("projectType"):
             tags.append(f"Project: {data['projectType']}")
+        if data.get("paymentStatus") == "PAID - $150":
+            tags.append("Paid-$150")
 
-        # Build custom fields / notes
+        # Notes for the contact
         notes = []
         if data.get("address"):
             notes.append(f"Property: {data['address']}")
@@ -116,7 +120,7 @@ async def push_to_ghl(data: dict, lead_type: str = "consultation"):
             "email": data.get("email", ""),
             "phone": data.get("phone", ""),
             "address1": data.get("address", ""),
-            "source": "ASAP Fence Large Yard Landing Page",
+            "source": GHL_LEAD_SOURCE,
             "tags": tags,
             "locationId": GHL_LOCATION_ID,
         }
@@ -128,7 +132,6 @@ async def push_to_ghl(data: dict, lead_type: str = "consultation"):
         }
 
         async with httpx.AsyncClient(timeout=15.0) as http_client:
-            # Create or update contact
             response = await http_client.post(
                 f"{GHL_BASE_URL}/contacts/upsert",
                 json=contact_payload,
@@ -140,10 +143,9 @@ async def push_to_ghl(data: dict, lead_type: str = "consultation"):
                 contact_id = contact_data.get("contact", {}).get("id")
                 logger.info(f"GHL contact created/updated: {contact_id}")
 
-                # Add a note with full details
                 if contact_id and notes:
                     note_payload = {
-                        "body": "\n".join(notes),
+                        "body": f"[{GHL_LEAD_SOURCE}]\n" + "\n".join(notes),
                         "contactId": contact_id,
                     }
                     await http_client.post(
@@ -164,7 +166,7 @@ async def push_to_ghl(data: dict, lead_type: str = "consultation"):
 
 
 async def push_callback_to_ghl(name: str, phone: str):
-    """Push a callback request to GHL"""
+    """Push a callback request to GHL with routing identifier"""
     if not GHL_API_KEY or not GHL_LOCATION_ID:
         return None
 
@@ -177,8 +179,12 @@ async def push_callback_to_ghl(name: str, phone: str):
             "firstName": first_name,
             "lastName": last_name,
             "phone": phone,
-            "source": "ASAP Fence Large Yard - Callback Request",
-            "tags": ["Large Yard Division", "Callback Request", "Source: Landing Page"],
+            "source": GHL_LEAD_SOURCE,
+            "tags": [
+                GHL_CALLBACK_TAG,
+                GHL_LEAD_SOURCE,
+                "Large Yard Division",
+            ],
             "locationId": GHL_LOCATION_ID,
         }
 
@@ -206,79 +212,7 @@ async def push_callback_to_ghl(name: str, phone: str):
     return None
 
 
-# ─── Email Notification ───────────────────────────────────────────────────────
-
-def send_email_notification(lead_data: dict, lead_type: str = "consultation"):
-    """Send email notification for new lead"""
-    try:
-        to_email = NOTIFICATION_EMAIL
-        subject = f"🔔 New {lead_type.title()} Lead — {lead_data.get('fullName', lead_data.get('phone', 'Unknown'))}"
-
-        if lead_type == "consultation":
-            html = f"""
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <div style="background: #1c1917; color: white; padding: 20px 24px; border-radius: 8px 8px 0 0;">
-                    <h2 style="margin: 0; font-size: 18px;">ASAP Fence & Gates — Large Yard Division</h2>
-                    <p style="margin: 4px 0 0; color: #d97706; font-size: 13px;">New VIP Consultation Request</p>
-                </div>
-                <div style="background: #fafaf9; padding: 24px; border: 1px solid #e7e5e4; border-top: none; border-radius: 0 0 8px 8px;">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <tr><td style="padding: 8px 0; color: #78716c; width: 120px;">Name:</td><td style="padding: 8px 0; font-weight: 600;">{lead_data.get('fullName', '')}</td></tr>
-                        <tr><td style="padding: 8px 0; color: #78716c;">Email:</td><td style="padding: 8px 0;">{lead_data.get('email', '')}</td></tr>
-                        <tr><td style="padding: 8px 0; color: #78716c;">Phone:</td><td style="padding: 8px 0; font-weight: 600;">{lead_data.get('phone', '')}</td></tr>
-                        <tr><td style="padding: 8px 0; color: #78716c;">Address:</td><td style="padding: 8px 0;">{lead_data.get('address', '')}</td></tr>
-                        <tr><td style="padding: 8px 0; color: #78716c;">Yard Size:</td><td style="padding: 8px 0;">{lead_data.get('yardSize', '')}</td></tr>
-                        <tr><td style="padding: 8px 0; color: #78716c;">Project:</td><td style="padding: 8px 0;">{lead_data.get('projectType', '')}</td></tr>
-                        <tr><td style="padding: 8px 0; color: #78716c;">Fence Style:</td><td style="padding: 8px 0;">{lead_data.get('fenceStyle', 'Not specified')}</td></tr>
-                        <tr><td style="padding: 8px 0; color: #78716c;">Timeline:</td><td style="padding: 8px 0;">{lead_data.get('timeline', 'Not specified')}</td></tr>
-                        <tr><td style="padding: 8px 0; color: #78716c;">Payment:</td><td style="padding: 8px 0; color: #16a34a; font-weight: 600;">{lead_data.get('paymentStatus', 'Pending')}</td></tr>
-                    </table>
-                    {f'<div style="margin-top: 16px; padding: 12px; background: white; border: 1px solid #e7e5e4; border-radius: 6px;"><strong>Message:</strong><br>{lead_data.get("message")}</div>' if lead_data.get('message') else ''}
-                </div>
-            </div>
-            """
-        else:  # callback
-            html = f"""
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <div style="background: #1c1917; color: white; padding: 20px 24px; border-radius: 8px 8px 0 0;">
-                    <h2 style="margin: 0; font-size: 18px;">ASAP Fence & Gates — Large Yard Division</h2>
-                    <p style="margin: 4px 0 0; color: #d97706; font-size: 13px;">Callback Request</p>
-                </div>
-                <div style="background: #fafaf9; padding: 24px; border: 1px solid #e7e5e4; border-top: none; border-radius: 0 0 8px 8px;">
-                    <p><strong>Name:</strong> {lead_data.get('name', 'Not provided')}</p>
-                    <p><strong>Phone:</strong> <span style="font-size: 18px; font-weight: 600;">{lead_data.get('phone', '')}</span></p>
-                    <p style="color: #78716c; font-size: 13px;">This person requested a callback from the landing page.</p>
-                </div>
-            </div>
-            """
-
-        msg = MIMEMultipart("alternative")
-        msg["Subject"] = subject
-        msg["From"] = f"ASAP Fence Leads <noreply@asapfenceandgate.com>"
-        msg["To"] = to_email
-        msg.attach(MIMEText(html, "html"))
-
-        # Try sending via common SMTP
-        smtp_host = os.environ.get("SMTP_HOST", "localhost")
-        smtp_port = int(os.environ.get("SMTP_PORT", "25"))
-        smtp_user = os.environ.get("SMTP_USER", "")
-        smtp_pass = os.environ.get("SMTP_PASS", "")
-
-        with smtplib.SMTP(smtp_host, smtp_port, timeout=10) as server:
-            if smtp_user and smtp_pass:
-                server.starttls()
-                server.login(smtp_user, smtp_pass)
-            server.sendmail(msg["From"], [to_email], msg.as_string())
-
-        logger.info(f"Email notification sent to {to_email}")
-        return True
-
-    except Exception as e:
-        logger.warning(f"Email notification failed (SMTP not configured): {e}")
-        return False
-
-
-# ─── Routes ───────────────────────────────────────────────────────────────────
+# --- Routes ---
 
 @api_router.get("/")
 async def root():
@@ -297,12 +231,11 @@ async def get_status_checks():
     return [StatusCheck(**sc) for sc in status_checks]
 
 
-# ─── Consultation / Stripe Checkout ──────────────────────────────────────────
+# --- Consultation / Stripe Checkout ---
 
 @api_router.post("/consultations")
 async def create_consultation(data: ConsultationCreate):
-    """Save lead, push to GHL, send email, create Stripe checkout"""
-
+    """Save lead, push to GHL, create Stripe checkout"""
     consultation_id = str(uuid.uuid4())
 
     consultation_doc = {
@@ -318,12 +251,13 @@ async def create_consultation(data: ConsultationCreate):
         "message": data.message,
         "status": "pending_payment",
         "paymentStatus": "unpaid",
-        "createdAt": datetime.utcnow().isoformat(),
+        "leadSource": GHL_LEAD_SOURCE,
+        "createdAt": datetime.now(timezone.utc).isoformat(),
     }
     await db.consultations.insert_one(consultation_doc)
     logger.info(f"Lead captured: {consultation_id} - {data.fullName}")
 
-    # Push to GHL (async, non-blocking)
+    # Push to GHL
     try:
         ghl_contact_id = await push_to_ghl(consultation_doc)
         if ghl_contact_id:
@@ -333,12 +267,6 @@ async def create_consultation(data: ConsultationCreate):
             )
     except Exception as e:
         logger.error(f"GHL push error: {e}")
-
-    # Send email notification (non-blocking)
-    try:
-        send_email_notification(consultation_doc, "consultation")
-    except Exception as e:
-        logger.error(f"Email error: {e}")
 
     # Create Stripe checkout
     origin = data.originUrl.rstrip("/")
@@ -375,6 +303,7 @@ async def create_consultation(data: ConsultationCreate):
                 "yard_size": data.yardSize,
                 "project_type": data.projectType,
                 "fence_style": data.fenceStyle or "Not specified",
+                "lead_source": GHL_LEAD_SOURCE,
             },
             payment_intent_data={
                 "description": f"VIP Fence Consultation for {data.fullName} — {data.address}",
@@ -403,7 +332,7 @@ async def create_consultation(data: ConsultationCreate):
             "currency": "usd",
             "payment_status": "initiated",
             "status": "pending",
-            "createdAt": datetime.utcnow().isoformat(),
+            "createdAt": datetime.now(timezone.utc).isoformat(),
         }
         await db.payment_transactions.insert_one(payment_doc)
         await db.consultations.update_one(
@@ -437,7 +366,7 @@ async def get_consultation_payment_status(session_id: str):
         session = stripe.checkout.Session.retrieve(session_id)
         await db.payment_transactions.update_one(
             {"session_id": session_id},
-            {"$set": {"status": session.status, "payment_status": session.payment_status, "updatedAt": datetime.utcnow().isoformat()}}
+            {"$set": {"status": session.status, "payment_status": session.payment_status, "updatedAt": datetime.now(timezone.utc).isoformat()}}
         )
 
         if session.payment_status == "paid":
@@ -445,9 +374,8 @@ async def get_consultation_payment_status(session_id: str):
             if consultation_id:
                 await db.consultations.update_one(
                     {"id": consultation_id},
-                    {"$set": {"status": "confirmed", "paymentStatus": "paid", "paidAt": datetime.utcnow().isoformat()}}
+                    {"$set": {"status": "confirmed", "paymentStatus": "paid", "paidAt": datetime.now(timezone.utc).isoformat()}}
                 )
-                # Update GHL with payment status
                 consultation = await db.consultations.find_one({"id": consultation_id})
                 if consultation:
                     try:
@@ -469,33 +397,27 @@ async def get_consultation_payment_status(session_id: str):
 
 @api_router.post("/callbacks")
 async def create_callback(data: CallbackCreate):
-    """Save callback, push to GHL, send email"""
+    """Save callback, push to GHL"""
     callback_doc = {
         "id": str(uuid.uuid4()),
         "name": data.name,
         "phone": data.phone,
         "status": "pending",
-        "createdAt": datetime.utcnow().isoformat(),
+        "leadSource": GHL_LEAD_SOURCE,
+        "createdAt": datetime.now(timezone.utc).isoformat(),
     }
     await db.callbacks.insert_one(callback_doc)
     logger.info(f"Callback: {data.phone}")
 
-    # Push to GHL
     try:
         await push_callback_to_ghl(data.name, data.phone)
     except Exception as e:
         logger.error(f"GHL callback error: {e}")
 
-    # Email
-    try:
-        send_email_notification({"name": data.name, "phone": data.phone}, "callback")
-    except Exception:
-        pass
-
     return {"status": "ok"}
 
 
-# ─── Admin Endpoints ──────────────────────────────────────────────────────────
+# --- Admin Endpoints ---
 
 @api_router.get("/admin/consultations")
 async def get_all_consultations():
