@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRight, Send, Phone, CheckCircle2, ShieldCheck, ArrowLeft, Lock, CreditCard } from "lucide-react";
+import { ArrowRight, Phone, CheckCircle2, ShieldCheck, ArrowLeft, Lock, CreditCard } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -20,7 +20,7 @@ const API = `${BACKEND_URL}/api`;
 
 export const CTASection = () => {
   const [formData, setFormData] = useState({});
-  const [step, setStep] = useState(1); // 1 = lead capture, 2 = review & pay
+  const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
 
   const handleChange = (name, value) => {
@@ -29,7 +29,6 @@ export const CTASection = () => {
 
   const handleStep1Submit = (e) => {
     e.preventDefault();
-    // Validate required fields
     const requiredFields = CONSULTATION_FORM_FIELDS.filter((f) => f.required);
     const missing = requiredFields.filter((f) => !formData[f.name]);
     if (missing.length > 0) {
@@ -37,8 +36,7 @@ export const CTASection = () => {
       return;
     }
     setStep(2);
-    // Scroll to top of consultation section
-    document.getElementById("consultation")?.scrollIntoView({ behavior: "smooth" });
+    document.getElementById("consultation-form")?.scrollIntoView({ behavior: "smooth" });
   };
 
   const handlePayment = async () => {
@@ -50,7 +48,6 @@ export const CTASection = () => {
       });
 
       if (response.data.checkoutUrl) {
-        // Redirect to Stripe Checkout
         window.location.href = response.data.checkoutUrl;
       } else {
         toast.error("Failed to create checkout session");
@@ -64,11 +61,29 @@ export const CTASection = () => {
   };
 
   return (
-    <section data-testid="cta-section" className="py-24 bg-stone-900" id="consultation">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="grid lg:grid-cols-[1fr_1.2fr] gap-16 items-start">
-          {/* Left - Info */}
-          <div>
+    <section data-testid="cta-section" className="py-16 sm:py-24 bg-stone-900" id="consultation">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Mobile: section header visible above form */}
+        <div className="lg:hidden text-center mb-8">
+          <span className="inline-block text-amber-400 text-sm font-semibold uppercase tracking-[0.15em] mb-3">
+            Start Your Project
+          </span>
+          <h2
+            className="text-2xl sm:text-3xl font-bold text-white mb-3"
+            style={{ fontFamily: "'Playfair Display', serif" }}
+          >
+            Book Your VIP Consultation
+          </h2>
+          <p className="text-stone-400 text-base leading-relaxed">
+            {step === 1
+              ? "Fill out the form below. Your dedicated project manager will contact you within hours."
+              : "Review your details and proceed to secure payment."}
+          </p>
+        </div>
+
+        <div className="grid lg:grid-cols-[1fr_1.2fr] gap-8 lg:gap-16 items-start">
+          {/* Left - Info (hidden on mobile, shown on desktop) */}
+          <div className="hidden lg:block">
             <span className="inline-block text-amber-400 text-sm font-semibold uppercase tracking-[0.15em] mb-4">
               Start Your Project
             </span>
@@ -148,229 +163,264 @@ export const CTASection = () => {
             {/* Direct Call Option */}
             <div className="p-6 rounded-xl bg-white/5 border border-white/10">
               <div className="text-sm text-stone-400 mb-3">Ready to talk? Skip the form.</div>
-              <a
-                href={`tel:${COMPANY.phone.replace(/[^0-9]/g, "")}`}
-                className="md:hidden flex items-center justify-center gap-3 w-full py-4 rounded-lg bg-white text-stone-900 font-bold text-lg hover:bg-stone-100 transition-all duration-200 shadow-lg"
-              >
-                <Phone className="w-5 h-5 text-amber-700" />
-                {COMPANY.phone}
-              </a>
-              <div className="hidden md:flex items-center gap-3 text-stone-300 font-semibold text-lg">
+              <div className="flex items-center gap-3 text-stone-300 font-semibold text-lg">
                 <Phone className="w-5 h-5 text-amber-400" />
                 {COMPANY.phone}
               </div>
             </div>
           </div>
 
-          {/* Right - Step 1: Form | Step 2: Review & Pay */}
-          {step === 1 ? (
-            <form
-              onSubmit={handleStep1Submit}
-              data-testid="consultation-form"
-              className="bg-white rounded-2xl p-8 sm:p-10 shadow-2xl shadow-black/20"
-            >
-              {/* Step indicator */}
-              <div className="flex items-center gap-3 mb-8">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center text-sm font-bold">1</div>
-                  <span className="text-sm font-semibold text-stone-800">Your Details</span>
+          {/* Right - Form (shows FIRST on mobile via order) */}
+          <div id="consultation-form">
+            {step === 1 ? (
+              <form
+                onSubmit={handleStep1Submit}
+                data-testid="consultation-form"
+                className="bg-white rounded-2xl p-6 sm:p-8 lg:p-10 shadow-2xl shadow-black/20"
+              >
+                {/* Step indicator */}
+                <div className="flex items-center gap-3 mb-6 sm:mb-8">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center text-sm font-bold">1</div>
+                    <span className="text-sm font-semibold text-stone-800">Your Details</span>
+                  </div>
+                  <div className="flex-1 h-px bg-stone-200" />
+                  <div className="flex items-center gap-2 opacity-40">
+                    <div className="w-8 h-8 rounded-full bg-stone-200 text-stone-500 flex items-center justify-center text-sm font-bold">2</div>
+                    <span className="text-sm font-medium text-stone-400">Secure Payment</span>
+                  </div>
                 </div>
-                <div className="flex-1 h-px bg-stone-200" />
-                <div className="flex items-center gap-2 opacity-40">
-                  <div className="w-8 h-8 rounded-full bg-stone-200 text-stone-500 flex items-center justify-center text-sm font-bold">2</div>
-                  <span className="text-sm font-medium text-stone-400">Secure Payment</span>
-                </div>
-              </div>
 
-              <div className="grid sm:grid-cols-2 gap-5">
-                {CONSULTATION_FORM_FIELDS.map((field) => {
-                  if (field.type === "textarea") {
-                    return (
-                      <div key={field.name} className="sm:col-span-2">
-                        <Label className="text-stone-700 font-medium text-sm mb-2 block">
-                          {field.label}
-                          {field.required && <span className="text-amber-600 ml-1">*</span>}
-                        </Label>
-                        <Textarea
-                          placeholder={field.placeholder}
-                          value={formData[field.name] || ""}
-                          onChange={(e) => handleChange(field.name, e.target.value)}
-                          className="border-stone-200 focus:border-amber-500 focus:ring-amber-500/20 min-h-[100px] rounded-lg resize-none"
-                        />
-                      </div>
-                    );
-                  }
+                <div className="grid sm:grid-cols-2 gap-4 sm:gap-5">
+                  {CONSULTATION_FORM_FIELDS.map((field) => {
+                    if (field.type === "textarea") {
+                      return (
+                        <div key={field.name} className="sm:col-span-2">
+                          <Label className="text-stone-700 font-medium text-sm mb-2 block">
+                            {field.label}
+                            {field.required && <span className="text-amber-600 ml-1">*</span>}
+                          </Label>
+                          <Textarea
+                            placeholder={field.placeholder}
+                            value={formData[field.name] || ""}
+                            onChange={(e) => handleChange(field.name, e.target.value)}
+                            className="border-stone-200 focus:border-amber-500 focus:ring-amber-500/20 min-h-[100px] rounded-lg resize-none"
+                          />
+                        </div>
+                      );
+                    }
 
-                  if (field.type === "select") {
+                    if (field.type === "select") {
+                      return (
+                        <div key={field.name} className={field.name === "address" ? "sm:col-span-2" : ""}>
+                          <Label className="text-stone-700 font-medium text-sm mb-2 block">
+                            {field.label}
+                            {field.required && <span className="text-amber-600 ml-1">*</span>}
+                          </Label>
+                          <Select
+                            value={formData[field.name] || ""}
+                            onValueChange={(val) => handleChange(field.name, val)}
+                          >
+                            <SelectTrigger className="border-stone-200 focus:border-amber-500 focus:ring-amber-500/20 rounded-lg h-11">
+                              <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {field.options.map((opt) => (
+                                <SelectItem key={opt} value={opt}>
+                                  {opt}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      );
+                    }
+
                     return (
                       <div key={field.name} className={field.name === "address" ? "sm:col-span-2" : ""}>
                         <Label className="text-stone-700 font-medium text-sm mb-2 block">
                           {field.label}
                           {field.required && <span className="text-amber-600 ml-1">*</span>}
                         </Label>
-                        <Select
+                        <Input
+                          type={field.type}
+                          placeholder={field.placeholder}
                           value={formData[field.name] || ""}
-                          onValueChange={(val) => handleChange(field.name, val)}
-                        >
-                          <SelectTrigger className="border-stone-200 focus:border-amber-500 focus:ring-amber-500/20 rounded-lg h-11">
-                            <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {field.options.map((opt) => (
-                              <SelectItem key={opt} value={opt}>
-                                {opt}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                          onChange={(e) => handleChange(field.name, e.target.value)}
+                          className="border-stone-200 focus:border-amber-500 focus:ring-amber-500/20 rounded-lg h-11"
+                        />
                       </div>
                     );
-                  }
+                  })}
+                </div>
 
-                  return (
-                    <div key={field.name} className={field.name === "address" ? "sm:col-span-2" : ""}>
-                      <Label className="text-stone-700 font-medium text-sm mb-2 block">
-                        {field.label}
-                        {field.required && <span className="text-amber-600 ml-1">*</span>}
-                      </Label>
-                      <Input
-                        type={field.type}
-                        placeholder={field.placeholder}
-                        value={formData[field.name] || ""}
-                        onChange={(e) => handleChange(field.name, e.target.value)}
-                        className="border-stone-200 focus:border-amber-500 focus:ring-amber-500/20 rounded-lg h-11"
-                      />
+                <Button
+                  type="submit"
+                  data-testid="consultation-step1-submit-btn"
+                  className="w-full mt-6 sm:mt-8 bg-amber-700 hover:bg-amber-800 text-white py-6 text-base font-semibold rounded-lg shadow-lg shadow-amber-700/20 transition-all duration-300 hover:shadow-amber-800/30 group"
+                >
+                  Continue to Secure Payment — $150
+                  <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-0.5" />
+                </Button>
+
+                <p className="text-center text-stone-400 text-xs mt-4">
+                  $150 consultation fee is fully credited toward your project. No spam. No obligation.
+                </p>
+              </form>
+            ) : (
+              /* Step 2: Review & Pay */
+              <div className="bg-white rounded-2xl p-6 sm:p-8 lg:p-10 shadow-2xl shadow-black/20">
+                {/* Step indicator */}
+                <div className="flex items-center gap-3 mb-6 sm:mb-8">
+                  <div className="flex items-center gap-2 opacity-60">
+                    <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-sm font-bold">
+                      <CheckCircle2 className="w-4 h-4" />
                     </div>
-                  );
-                })}
-              </div>
-
-              <Button
-                type="submit"
-                data-testid="consultation-step1-submit-btn"
-                className="w-full mt-8 bg-amber-700 hover:bg-amber-800 text-white py-6 text-base font-semibold rounded-lg shadow-lg shadow-amber-700/20 transition-all duration-300 hover:shadow-amber-800/30 group"
-              >
-                Continue to Secure Payment — $150
-                <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-0.5" />
-              </Button>
-
-              <p className="text-center text-stone-400 text-xs mt-4">
-                $150 consultation fee is fully credited toward your project. No spam. No obligation.
-              </p>
-            </form>
-          ) : (
-            /* Step 2: Review & Pay */
-            <div className="bg-white rounded-2xl p-8 sm:p-10 shadow-2xl shadow-black/20">
-              {/* Step indicator */}
-              <div className="flex items-center gap-3 mb-8">
-                <div className="flex items-center gap-2 opacity-60">
-                  <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-sm font-bold">
-                    <CheckCircle2 className="w-4 h-4" />
+                    <span className="text-sm font-medium text-stone-500">Your Details</span>
                   </div>
-                  <span className="text-sm font-medium text-stone-500">Your Details</span>
+                  <div className="flex-1 h-px bg-amber-300" />
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center text-sm font-bold">2</div>
+                    <span className="text-sm font-semibold text-stone-800">Secure Payment</span>
+                  </div>
                 </div>
-                <div className="flex-1 h-px bg-amber-300" />
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center text-sm font-bold">2</div>
-                  <span className="text-sm font-semibold text-stone-800">Secure Payment</span>
-                </div>
-              </div>
 
-              {/* Summary */}
-              <div className="bg-stone-50 rounded-xl p-6 mb-6 border border-stone-100">
-                <h3 className="text-sm font-semibold text-stone-500 uppercase tracking-wider mb-4">Consultation Details</h3>
-                <div className="grid sm:grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-stone-400 block">Name</span>
-                    <span className="text-stone-800 font-medium">{formData.fullName}</span>
-                  </div>
-                  <div>
-                    <span className="text-stone-400 block">Email</span>
-                    <span className="text-stone-800 font-medium">{formData.email}</span>
-                  </div>
-                  <div>
-                    <span className="text-stone-400 block">Phone</span>
-                    <span className="text-stone-800 font-medium">{formData.phone}</span>
-                  </div>
-                  <div>
-                    <span className="text-stone-400 block">Property</span>
-                    <span className="text-stone-800 font-medium">{formData.address}</span>
-                  </div>
-                  <div>
-                    <span className="text-stone-400 block">Yard Size</span>
-                    <span className="text-stone-800 font-medium">{formData.yardSize}</span>
-                  </div>
-                  <div>
-                    <span className="text-stone-400 block">Project</span>
-                    <span className="text-stone-800 font-medium">{formData.projectType}</span>
-                  </div>
-                  {formData.fenceStyle && (
+                {/* Summary */}
+                <div className="bg-stone-50 rounded-xl p-4 sm:p-6 mb-6 border border-stone-100">
+                  <h3 className="text-sm font-semibold text-stone-500 uppercase tracking-wider mb-4">Consultation Details</h3>
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4 text-sm">
                     <div>
-                      <span className="text-stone-400 block">Fence Style</span>
-                      <span className="text-stone-800 font-medium">{formData.fenceStyle}</span>
+                      <span className="text-stone-400 block text-xs">Name</span>
+                      <span className="text-stone-800 font-medium">{formData.fullName}</span>
                     </div>
+                    <div>
+                      <span className="text-stone-400 block text-xs">Email</span>
+                      <span className="text-stone-800 font-medium break-all">{formData.email}</span>
+                    </div>
+                    <div>
+                      <span className="text-stone-400 block text-xs">Phone</span>
+                      <span className="text-stone-800 font-medium">{formData.phone}</span>
+                    </div>
+                    <div>
+                      <span className="text-stone-400 block text-xs">Property</span>
+                      <span className="text-stone-800 font-medium break-words">{formData.address}</span>
+                    </div>
+                    <div>
+                      <span className="text-stone-400 block text-xs">Yard Size</span>
+                      <span className="text-stone-800 font-medium">{formData.yardSize}</span>
+                    </div>
+                    <div>
+                      <span className="text-stone-400 block text-xs">Project</span>
+                      <span className="text-stone-800 font-medium">{formData.projectType}</span>
+                    </div>
+                    {formData.fenceStyle && (
+                      <div>
+                        <span className="text-stone-400 block text-xs">Fence Style</span>
+                        <span className="text-stone-800 font-medium">{formData.fenceStyle}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Payment Summary */}
+                <div className="bg-amber-50 rounded-xl p-4 sm:p-6 mb-6 border border-amber-100">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-stone-700 font-medium text-sm">VIP Consultation Fee</span>
+                    <span className="text-2xl font-bold text-stone-900" style={{ fontFamily: "'Playfair Display', serif" }}>$150.00</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-amber-700 text-sm">
+                    <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                    <span className="font-medium">Credited in full toward your fence installation</span>
+                  </div>
+                </div>
+
+                {/* Guarantee */}
+                <div className="flex items-start gap-3 bg-emerald-50 border border-emerald-100 rounded-xl p-4 mb-6">
+                  <ShieldCheck className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <span className="text-emerald-800 text-sm font-semibold">{SATISFACTION_GUARANTEE.headline}</span>
+                    <p className="text-emerald-700/70 text-xs mt-1">
+                      Not satisfied with your consultation? We'll refund the full $150 — no questions asked.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <Button
+                  onClick={handlePayment}
+                  disabled={loading}
+                  data-testid="consultation-pay-btn"
+                  className="w-full bg-amber-700 hover:bg-amber-800 text-white py-6 text-base font-semibold rounded-lg shadow-lg shadow-amber-700/20 transition-all duration-300 hover:shadow-amber-800/30 group disabled:opacity-70 mb-3"
+                >
+                  {loading ? (
+                    <span className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Connecting to secure checkout...
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <Lock className="w-4 h-4" />
+                      Pay $150 — Proceed to Secure Checkout
+                      <CreditCard className="w-4 h-4 ml-1" />
+                    </span>
                   )}
+                </Button>
+
+                <button
+                  onClick={() => setStep(1)}
+                  className="flex items-center justify-center gap-2 w-full py-3 text-stone-500 text-sm font-medium hover:text-stone-700 transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Back to edit details
+                </button>
+
+                <div className="flex items-center justify-center gap-2 mt-4 text-stone-400 text-xs">
+                  <Lock className="w-3 h-3" />
+                  <span>Secured by Stripe. Your payment info is never stored on our servers.</span>
                 </div>
               </div>
+            )}
 
-              {/* Payment Summary */}
-              <div className="bg-amber-50 rounded-xl p-6 mb-6 border border-amber-100">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-stone-700 font-medium">VIP Consultation Fee</span>
-                  <span className="text-2xl font-bold text-stone-900" style={{ fontFamily: "'Playfair Display', serif" }}>$150.00</span>
+            {/* Mobile-only: compact info below form */}
+            <div className="lg:hidden mt-8 space-y-4">
+              {/* $150 explanation */}
+              <div className="p-5 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                <div className="flex items-baseline gap-2 mb-2">
+                  <span className="text-2xl font-bold text-amber-300" style={{ fontFamily: "'Playfair Display', serif" }}>$150</span>
+                  <span className="text-amber-400/80 text-sm font-medium">credited toward your project</span>
                 </div>
-                <div className="flex items-center gap-2 text-amber-700 text-sm">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span className="font-medium">Credited in full toward your fence installation</span>
-                </div>
+                <p className="text-stone-300 text-sm leading-relaxed">
+                  The consultation fee filters out tire kickers so we can dedicate our full attention to serious homeowners. It's credited in full when you move forward.
+                </p>
               </div>
 
               {/* Guarantee */}
-              <div className="flex items-start gap-3 bg-emerald-50 border border-emerald-100 rounded-xl p-4 mb-6">
-                <ShieldCheck className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <span className="text-emerald-800 text-sm font-semibold">{SATISFACTION_GUARANTEE.headline}</span>
-                  <p className="text-emerald-700/70 text-xs mt-1">
-                    Not satisfied with your consultation? We'll refund the full $150 — no questions asked.
-                  </p>
+              <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                <div className="flex items-start gap-3">
+                  <ShieldCheck className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <span className="text-emerald-300 text-sm font-semibold">{SATISFACTION_GUARANTEE.headline}</span>
+                    <p className="text-stone-400 text-xs leading-relaxed mt-1">
+                      Not satisfied? Full $150 refund — no questions asked.
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              {/* Actions */}
-              <Button
-                onClick={handlePayment}
-                disabled={loading}
-                data-testid="consultation-pay-btn"
-                className="w-full bg-amber-700 hover:bg-amber-800 text-white py-6 text-base font-semibold rounded-lg shadow-lg shadow-amber-700/20 transition-all duration-300 hover:shadow-amber-800/30 group disabled:opacity-70 mb-3"
-              >
-                {loading ? (
-                  <span className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Connecting to secure checkout...
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-2">
-                    <Lock className="w-4 h-4" />
-                    Pay $150 — Proceed to Secure Checkout
-                    <CreditCard className="w-4 h-4 ml-1" />
-                  </span>
-                )}
-              </Button>
-
-              <button
-                onClick={() => setStep(1)}
-                className="flex items-center justify-center gap-2 w-full py-3 text-stone-500 text-sm font-medium hover:text-stone-700 transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back to edit details
-              </button>
-
-              <div className="flex items-center justify-center gap-2 mt-4 text-stone-400 text-xs">
-                <Lock className="w-3 h-3" />
-                <span>Secured by Stripe. Your payment info is never stored on our servers.</span>
+              {/* Call CTA */}
+              <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                <div className="text-sm text-stone-400 mb-2">Ready to talk? Skip the form.</div>
+                <a
+                  href={`tel:${COMPANY.phone.replace(/[^0-9]/g, "")}`}
+                  data-testid="cta-mobile-call-btn"
+                  className="flex items-center justify-center gap-3 w-full py-3 rounded-lg bg-white text-stone-900 font-bold text-base hover:bg-stone-100 transition-all duration-200"
+                >
+                  <Phone className="w-4 h-4 text-amber-700" />
+                  {COMPANY.phone}
+                </a>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </section>
