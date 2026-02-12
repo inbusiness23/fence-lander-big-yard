@@ -1,6 +1,6 @@
-import { Phone, ArrowRight, Clock, User, Briefcase, Gem, Star } from "lucide-react";
+import { Phone, ArrowRight, Clock, User, Briefcase, Gem, Star, ShieldCheck } from "lucide-react";
 import { Button } from "./ui/button";
-import { COMPANY } from "../data/mock";
+import { COMPANY, SATISFACTION_GUARANTEE } from "../data/mock";
 
 export const WhyNotFreeSection = () => {
   const scrollTo = (id) => {
