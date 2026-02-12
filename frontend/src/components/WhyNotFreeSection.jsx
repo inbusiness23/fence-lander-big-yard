@@ -70,7 +70,7 @@ export const WhyNotFreeSection = () => {
           </div>
 
           {/* Right - What You Actually Get */}
-          <div>
+          <div className="min-w-0">
             <div className="bg-stone-800/50 backdrop-blur-sm rounded-2xl border border-stone-700/50 p-6 sm:p-8 lg:p-10">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-lg bg-amber-500/15 flex items-center justify-center">
