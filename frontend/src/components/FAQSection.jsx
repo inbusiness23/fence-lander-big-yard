@@ -10,7 +10,7 @@ export const FAQSection = () => {
   return (
     <section className="py-24 bg-stone-50" id="faq">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="grid lg:grid-cols-[1fr_1.5fr] gap-16 items-start max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-[1fr_1.5fr] gap-12 lg:gap-16 items-start max-w-6xl mx-auto">
           {/* Left Column */}
           <div className="lg:sticky lg:top-32">
             <span className="inline-block text-amber-700 text-sm font-semibold uppercase tracking-[0.15em] mb-4">
