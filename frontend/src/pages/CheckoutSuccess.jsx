@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { CheckCircle2, Phone, ArrowRight, ShieldCheck, Loader2 } from "lucide-react";
+import { CheckCircle2, Phone, ArrowRight, ShieldCheck, Loader2, Clock } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { COMPANY } from "../data/mock";
 import axios from "axios";
@@ -10,7 +10,6 @@ const API = `${BACKEND_URL}/api`;
 export default function CheckoutSuccess() {
   const [status, setStatus] = useState("checking");
   const [consultation, setConsultation] = useState(null);
-  const [attempts, setAttempts] = useState(0);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -35,9 +34,7 @@ export default function CheckoutSuccess() {
           return;
         }
 
-        // Continue polling
         if (attempt < 8) {
-          setAttempts(attempt + 1);
           setTimeout(() => pollStatus(attempt + 1), 2500);
         } else {
           setStatus("timeout");
@@ -56,7 +53,7 @@ export default function CheckoutSuccess() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-stone-50 flex items-center justify-center px-6">
+    <div className="min-h-screen bg-stone-50 flex items-center justify-center px-4 sm:px-6">
       <div className="max-w-lg w-full text-center">
         {status === "checking" && (
           <>
@@ -66,6 +63,7 @@ export default function CheckoutSuccess() {
             <h1
               className="text-2xl font-bold text-stone-900 mb-3"
               style={{ fontFamily: "'Playfair Display', serif" }}
+              data-testid="success-checking-heading"
             >
               Confirming Your Payment...
             </h1>
@@ -79,24 +77,37 @@ export default function CheckoutSuccess() {
               <CheckCircle2 className="w-10 h-10 text-emerald-600" />
             </div>
             <h1
-              className="text-3xl font-bold text-stone-900 mb-3"
+              className="text-2xl sm:text-3xl font-bold text-stone-900 mb-3"
               style={{ fontFamily: "'Playfair Display', serif" }}
+              data-testid="success-confirmed-heading"
             >
-              You're Confirmed, {consultation?.fullName?.split(" ")[0] || ""}
+              You're Confirmed{consultation?.fullName ? `, ${consultation.fullName.split(" ")[0]}` : ""}!
             </h1>
-            <p className="text-stone-500 text-lg leading-relaxed mb-8">
-              Your VIP consultation has been booked. Your dedicated project manager will contact
-              you within hours — typically the same day or next business day.
-            </p>
 
-            <div className="bg-white rounded-xl p-6 border border-stone-200 mb-8 text-left">
+            {/* Urgency / "We're reaching out now" messaging */}
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-6 text-left">
+              <div className="flex items-start gap-3">
+                <Clock className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-stone-900 font-semibold text-base mb-1">
+                    We're reaching out to you right now.
+                  </p>
+                  <p className="text-stone-600 text-sm leading-relaxed">
+                    Your dedicated project manager has been notified and will contact you shortly to schedule your
+                    VIP on-site appointment — typically the same day or next business day.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-5 sm:p-6 border border-stone-200 mb-6 text-left">
               <h3 className="text-sm font-semibold text-stone-400 uppercase tracking-wider mb-4">What Happens Next</h3>
               <div className="space-y-4">
                 {[
-                  "Your dedicated project manager will call you to schedule your on-site visit",
+                  "Your project manager will call you to schedule your on-site VIP visit",
                   "They'll arrive with material samples and walk your entire fence line",
                   "You'll receive a detailed custom proposal within 48 hours",
-                  "Your $150 will be credited toward your project when you proceed",
+                  "Your $150 is credited in full toward your project when you proceed",
                 ].map((step, idx) => (
                   <div key={idx} className="flex items-start gap-3">
                     <div className="w-6 h-6 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -117,7 +128,7 @@ export default function CheckoutSuccess() {
 
             <div className="space-y-3">
               <a href="/">
-                <Button className="w-full bg-amber-700 hover:bg-amber-800 text-white py-5 font-semibold rounded-lg">
+                <Button data-testid="success-return-home-btn" className="w-full bg-amber-700 hover:bg-amber-800 text-white py-5 font-semibold rounded-lg">
                   Return to Home
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
@@ -125,6 +136,7 @@ export default function CheckoutSuccess() {
               <a
                 href={`tel:${COMPANY.phone.replace(/[^0-9]/g, "")}`}
                 className="flex items-center justify-center gap-2 py-3 text-stone-500 text-sm font-medium hover:text-stone-700 transition-colors"
+                data-testid="success-call-link"
               >
                 <Phone className="w-4 h-4" />
                 Questions? Call {COMPANY.phone}
@@ -147,10 +159,10 @@ export default function CheckoutSuccess() {
             <p className="text-stone-500 text-lg leading-relaxed mb-8">
               {status === "expired"
                 ? "Your payment session has expired. Please try booking again."
-                : "We received your information. If your payment was processed, your project manager will be in touch shortly. If you have any questions, give us a call."}
+                : "We received your information. If your payment was processed, your project manager will reach out to you right away to get your VIP appointment set up. If you have any questions, give us a call."}
             </p>
             <div className="space-y-3">
-              <a href="/#consultation">
+              <a href="/#consultation-form">
                 <Button className="w-full bg-amber-700 hover:bg-amber-800 text-white py-5 font-semibold rounded-lg">
                   Book Again
                 </Button>
