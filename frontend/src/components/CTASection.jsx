@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import { Label } from "./ui/label";
-import { CONSULTATION_FORM_FIELDS, COMPANY } from "../data/mock";
+import { CONSULTATION_FORM_FIELDS, COMPANY, SATISFACTION_GUARANTEE } from "../data/mock";
 import { toast } from "sonner";
 
 export const CTASection = () => {
