@@ -287,6 +287,50 @@ export const CTASection = () => {
                       );
                     }
 
+                    // Email field with validation
+                    if (field.name === "email") {
+                      return (
+                        <div key={field.name}>
+                          <Label className="text-stone-700 font-medium text-sm mb-2 block">
+                            {field.label}
+                            {field.required && <span className="text-amber-600 ml-1">*</span>}
+                          </Label>
+                          <Input
+                            type="email"
+                            placeholder={field.placeholder}
+                            value={formData[field.name] || ""}
+                            onChange={(e) => handleChange(field.name, e.target.value)}
+                            onBlur={handleEmailBlur}
+                            data-testid="email-input"
+                            className={`border-stone-200 focus:border-amber-500 focus:ring-amber-500/20 rounded-lg h-11 ${emailError ? "border-red-400 focus:border-red-500" : ""}`}
+                          />
+                          {emailError && (
+                            <div className="mt-1.5 flex items-start gap-1.5" data-testid="email-error">
+                              <AlertCircle className="w-3.5 h-3.5 text-red-500 flex-shrink-0 mt-0.5" />
+                              <span className="text-xs text-red-600">
+                                {emailSuggestion ? (
+                                  <>
+                                    Did you mean{" "}
+                                    <button
+                                      type="button"
+                                      onClick={acceptEmailSuggestion}
+                                      data-testid="email-suggestion-btn"
+                                      className="text-amber-700 font-semibold underline underline-offset-2 hover:text-amber-800"
+                                    >
+                                      {emailSuggestion}
+                                    </button>
+                                    ?
+                                  </>
+                                ) : (
+                                  emailError
+                                )}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    }
+
                     return (
                       <div key={field.name} className={field.name === "address" ? "sm:col-span-2" : ""}>
                         <Label className="text-stone-700 font-medium text-sm mb-2 block">
@@ -304,6 +348,27 @@ export const CTASection = () => {
                     );
                   })}
                 </div>
+
+                {/* A2P SMS Consent */}
+                {formData.phone && (
+                  <div className="mt-5 p-4 rounded-lg bg-stone-50 border border-stone-200" data-testid="sms-consent-section">
+                    <div className="flex items-start gap-3">
+                      <Checkbox
+                        id="sms-consent"
+                        checked={smsConsent}
+                        onCheckedChange={setSmsConsent}
+                        data-testid="sms-consent-checkbox"
+                        className="mt-0.5 border-stone-300 data-[state=checked]:bg-amber-700 data-[state=checked]:border-amber-700"
+                      />
+                      <label htmlFor="sms-consent" className="text-xs text-stone-500 leading-relaxed cursor-pointer">
+                        By checking this box, I consent to receive automated text messages from
+                        <span className="font-semibold text-stone-700"> ASAP Fence & Gates</span> at the phone number provided above
+                        regarding my fence consultation and project updates. Message frequency varies. Msg & data rates may apply.
+                        Reply STOP to cancel at any time. Reply HELP for help. Consent is not a condition of purchase.
+                      </label>
+                    </div>
+                  </div>
+                )}
 
                 <Button
                   type="submit"
