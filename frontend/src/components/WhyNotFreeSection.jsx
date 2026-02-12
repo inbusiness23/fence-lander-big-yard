@@ -8,11 +8,11 @@ export const WhyNotFreeSection = () => {
   };
 
   return (
-    <section className="py-16 sm:py-24 bg-stone-900" id="why-150">
+    <section className="py-16 sm:py-24 bg-stone-900 overflow-hidden" id="why-150">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-start">
           {/* Left - The Argument */}
-          <div>
+          <div className="min-w-0">
             <span className="inline-block text-amber-400 text-sm font-semibold uppercase tracking-[0.15em] mb-5">
               The $150 Question
             </span>
