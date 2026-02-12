@@ -123,6 +123,11 @@ export const BEFORE_AFTER = {
   },
 };
 
+export const SATISFACTION_GUARANTEE = {
+  headline: "100% Satisfaction Guarantee",
+  description: "If you're not completely satisfied with your VIP consultation for any reason, we'll refund your $150 fee — no questions asked. We're that confident in the experience we deliver.",
+};
+
 export const FEATURED_IN = [
   { name: "Orlando Sentinel", type: "newspaper" },
   { name: "Seminole Chronicle", type: "newspaper" },
