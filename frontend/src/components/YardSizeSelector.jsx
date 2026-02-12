@@ -134,7 +134,7 @@ export const YardSizeSelector = () => {
               </span>
               <Button
                 data-testid="yard-size-book-btn"
-                onClick={() => scrollTo("consultation")}
+                onClick={() => scrollTo("consultation-form")}
                 className="ml-0 sm:ml-2 bg-amber-700 hover:bg-amber-800 text-white text-sm px-5 py-2 rounded-lg transition-all duration-200 group"
               >
                 Book VIP Consultation — $150
