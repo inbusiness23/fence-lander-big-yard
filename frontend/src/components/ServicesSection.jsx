@@ -30,7 +30,7 @@ export const ServicesSection = () => {
               className="group bg-white rounded-2xl overflow-hidden border border-stone-200/60 hover:shadow-xl hover:border-stone-200 transition-all duration-400 hover:-translate-y-1"
             >
               {/* Image */}
-              <div className="relative h-48 overflow-hidden">
+              <div className="relative h-64 overflow-hidden">
                 <img
                   src={style.image}
                   alt={style.title}
