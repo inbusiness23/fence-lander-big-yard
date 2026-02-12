@@ -6,6 +6,7 @@ import { WhyChooseUs } from "../components/WhyChooseUs";
 import { ServicesSection } from "../components/ServicesSection";
 import { BeforeAfterSection } from "../components/BeforeAfterSection";
 import { HowItWorks } from "../components/HowItWorks";
+import { WhyNotFreeSection } from "../components/WhyNotFreeSection";
 import { TestimonialsSection } from "../components/TestimonialsSection";
 import { FAQSection } from "../components/FAQSection";
 import { CTASection } from "../components/CTASection";
@@ -22,6 +23,7 @@ export default function LandingPage() {
       <ServicesSection />
       <BeforeAfterSection />
       <HowItWorks />
+      <WhyNotFreeSection />
       <TestimonialsSection />
       <FAQSection />
       <CTASection />
