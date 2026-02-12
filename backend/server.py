@@ -253,6 +253,8 @@ async def create_consultation(data: ConsultationCreate):
         "fenceStyle": data.fenceStyle,
         "timeline": data.timeline,
         "message": data.message,
+        "smsConsent": data.smsConsent,
+        "smsConsentTimestamp": data.smsConsentTimestamp,
         "status": "pending_payment",
         "paymentStatus": "unpaid",
         "leadSource": GHL_LEAD_SOURCE,
