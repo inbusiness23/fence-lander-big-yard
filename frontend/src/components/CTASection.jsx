@@ -119,7 +119,7 @@ export const CTASection = () => {
             </div>
 
             {/* Financing */}
-            <div className="p-5 rounded-xl bg-stone-800/60 border border-stone-700/50 mb-8">
+            <div className="p-5 rounded-xl bg-stone-800/60 border border-stone-700/50 mb-6">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-8 h-8 rounded-full bg-amber-500/15 flex items-center justify-center flex-shrink-0">
                   <span className="text-amber-400 text-sm font-bold">$</span>
@@ -129,6 +129,19 @@ export const CTASection = () => {
               <p className="text-stone-400 text-sm leading-relaxed ml-11">
                 Spread your fence investment over time with our easy-to-apply financing. Most homeowners are approved quickly with competitive rates. Ask your project manager for details.
               </p>
+            </div>
+
+            {/* Satisfaction Guarantee */}
+            <div className="p-5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 mb-8">
+              <div className="flex items-start gap-3">
+                <ShieldCheck className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <span className="text-emerald-300 text-sm font-semibold">{SATISFACTION_GUARANTEE.headline}</span>
+                  <p className="text-stone-400 text-sm leading-relaxed mt-1">
+                    {SATISFACTION_GUARANTEE.description}
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Benefits */}
