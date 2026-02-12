@@ -75,7 +75,7 @@ class TestConsultationEndpoint:
             "fenceStyle": "White Vinyl Privacy",
             "timeline": "Within 1 month",
             "message": "Test consultation from automated tests",
-            "originUrl": "https://asap-fence-vip.preview.emergentagent.com"
+            "originUrl": "https://luxuryfence.preview.emergentagent.com"
         }
         response = requests.post(f"{BASE_URL}/api/consultations", json=consultation_data)
         assert response.status_code == 200
@@ -100,7 +100,7 @@ class TestConsultationEndpoint:
             "yardSize": "½ – ¾ Acre",
             "projectType": "New Fence Installation",
             "smsConsent": False,
-            "originUrl": "https://asap-fence-vip.preview.emergentagent.com"
+            "originUrl": "https://luxuryfence.preview.emergentagent.com"
         }
         response = requests.post(f"{BASE_URL}/api/consultations", json=consultation_data)
         assert response.status_code == 200
@@ -120,7 +120,7 @@ class TestConsultationEndpoint:
             "projectType": "Fence Replacement",
             "smsConsent": True,
             "smsConsentTimestamp": "2026-02-12T17:00:00.000Z",
-            "originUrl": "https://asap-fence-vip.preview.emergentagent.com"
+            "originUrl": "https://luxuryfence.preview.emergentagent.com"
         }
         response = requests.post(f"{BASE_URL}/api/consultations", json=consultation_data)
         assert response.status_code == 200
@@ -138,7 +138,7 @@ class TestConsultationEndpoint:
             "yardSize": "¼ – ½ Acre",
             "projectType": "Both — Replace & Extend",
             "smsConsent": False,
-            "originUrl": "https://asap-fence-vip.preview.emergentagent.com"
+            "originUrl": "https://luxuryfence.preview.emergentagent.com"
         }
         response = requests.post(f"{BASE_URL}/api/consultations", json=consultation_data)
         assert response.status_code == 200
@@ -154,7 +154,7 @@ class TestConsultationEndpoint:
             "address": "789 Oak Ave, Lake Mary, FL 32746",
             "yardSize": "¼ – ½ Acre",
             "projectType": "Fence Replacement",
-            "originUrl": "https://asap-fence-vip.preview.emergentagent.com"
+            "originUrl": "https://luxuryfence.preview.emergentagent.com"
         }
         response = requests.post(f"{BASE_URL}/api/consultations", json=consultation_data)
         assert response.status_code == 200
@@ -190,7 +190,7 @@ class TestSMSConsentVerification:
             "projectType": "New Fence Installation",
             "smsConsent": True,
             "smsConsentTimestamp": "2026-02-12T17:30:00.000Z",
-            "originUrl": "https://asap-fence-vip.preview.emergentagent.com"
+            "originUrl": "https://luxuryfence.preview.emergentagent.com"
         }
         
         # Create the consultation
