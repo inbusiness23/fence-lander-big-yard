@@ -114,7 +114,8 @@ export const CTASection = () => {
             {/* Benefits */}
             <div className="space-y-5 mb-10">
               {[
-                "Same-week on-site consultation",
+                "Same-day or next-day on-site consultation",
+                "$150 fee credited toward your installation",
                 "Detailed proposal within 48 hours",
                 "Transparent pricing — no hidden fees",
                 "Dedicated project manager assigned to you",
