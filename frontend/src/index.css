@@ -1,4 +1,4 @@
-@tailwind base;
+#emergent-badge { display: none !important; }
 @tailwind components;
 @tailwind utilities;
 
