@@ -13,7 +13,7 @@ export const HeroSection = () => {
       <div className="absolute inset-0">
         <img
           src={HERO.image}
-          alt="Premium large yard with fencing"
+          alt="Central Florida large yard with premium fencing"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-stone-950/90 via-stone-900/75 to-stone-900/40" />
@@ -54,7 +54,7 @@ export const HeroSection = () => {
           </p>
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-14">
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <Button
               onClick={() => scrollTo("consultation")}
               className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-6 text-base font-semibold rounded-lg shadow-xl shadow-amber-600/25 transition-all duration-300 hover:shadow-amber-700/35 hover:-translate-y-0.5 group"
@@ -73,11 +73,16 @@ export const HeroSection = () => {
             </a>
           </div>
 
+          {/* Fee Note */}
+          <p className="text-amber-200/70 text-sm mb-10">
+            $150 consultation fee — credited in full toward your project
+          </p>
+
           {/* Trust Badges */}
           <div className="flex flex-wrap gap-6 items-center">
             {[
               { icon: Shield, text: "Licensed & Insured" },
-              { icon: Clock, text: "Same-Week Estimates" },
+              { icon: Clock, text: "Same-Day Consultations" },
               { icon: Star, text: "5-Star Rated" },
             ].map(({ icon: Icon, text }) => (
               <div key={text} className="flex items-center gap-2 text-stone-400">
