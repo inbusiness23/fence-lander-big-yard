@@ -61,8 +61,9 @@ export const CTASection = () => {
             We'll Be in Touch Soon
           </h2>
           <p className="text-stone-400 text-lg leading-relaxed mb-8">
-            Your dedicated project manager will reach out within 24 hours to schedule
-            your on-site consultation. We appreciate you choosing ASAP Fence & Gates.
+            Your dedicated project manager will reach out within hours to schedule
+            your on-site consultation — typically the same day or next business day. 
+            Your $150 VIP consultation fee will be credited toward your project.
           </p>
           <Button
             onClick={() => {
