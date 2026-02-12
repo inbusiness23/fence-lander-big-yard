@@ -117,6 +117,10 @@ async def push_to_ghl(data: dict, lead_type: str = "consultation"):
             notes.append(f"Notes: {data['message']}")
         if data.get("paymentStatus"):
             notes.append(f"Payment Status: {data['paymentStatus']}")
+        if data.get("smsConsent"):
+            notes.append(f"SMS Consent: Yes (at {data.get('smsConsentTimestamp', 'N/A')})")
+        else:
+            notes.append("SMS Consent: No")
 
         contact_payload = {
             "firstName": first_name,
