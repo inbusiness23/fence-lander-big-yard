@@ -1,0 +1,227 @@
+import { useState } from "react";
+import { ArrowRight, Send, Phone, CheckCircle2 } from "lucide-react";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Textarea } from "./ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+import { Label } from "./ui/label";
+import { CONSULTATION_FORM_FIELDS, COMPANY } from "../data/mock";
+import { toast } from "sonner";
+
+export const CTASection = () => {
+  const [formData, setFormData] = useState({});
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (name, value) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Basic validation
+    const requiredFields = CONSULTATION_FORM_FIELDS.filter((f) => f.required);
+    const missing = requiredFields.filter((f) => !formData[f.name]);
+    if (missing.length > 0) {
+      toast.error(`Please fill in: ${missing.map((f) => f.label).join(", ")}`);
+      return;
+    }
+
+    setLoading(true);
+    // Simulate submission (frontend-only mock)
+    setTimeout(() => {
+      setLoading(false);
+      setSubmitted(true);
+      // Store in localStorage as mock
+      const existing = JSON.parse(localStorage.getItem("consultations") || "[]");
+      existing.push({ ...formData, timestamp: new Date().toISOString() });
+      localStorage.setItem("consultations", JSON.stringify(existing));
+      toast.success("Consultation request submitted!");
+    }, 1500);
+  };
+
+  if (submitted) {
+    return (
+      <section className="py-24 bg-stone-900" id="consultation">
+        <div className="max-w-2xl mx-auto px-6 lg:px-8 text-center">
+          <div className="w-20 h-20 rounded-full bg-amber-500/20 flex items-center justify-center mx-auto mb-8">
+            <CheckCircle2 className="w-10 h-10 text-amber-400" />
+          </div>
+          <h2
+            className="text-3xl sm:text-4xl font-bold text-white mb-4"
+            style={{ fontFamily: "'Playfair Display', serif" }}
+          >
+            We'll Be in Touch Soon
+          </h2>
+          <p className="text-stone-400 text-lg leading-relaxed mb-8">
+            Your dedicated project manager will reach out within 24 hours to schedule
+            your on-site consultation. We appreciate you choosing ASAP Fence & Gates.
+          </p>
+          <Button
+            onClick={() => {
+              setSubmitted(false);
+              setFormData({});
+            }}
+            variant="outline"
+            className="border-stone-600 text-stone-300 hover:bg-stone-800 hover:text-white"
+          >
+            Submit Another Request
+          </Button>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="py-24 bg-stone-900" id="consultation">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="grid lg:grid-cols-[1fr_1.2fr] gap-16 items-start">
+          {/* Left - Info */}
+          <div>
+            <span className="inline-block text-amber-400 text-sm font-semibold uppercase tracking-[0.15em] mb-4">
+              Start Your Project
+            </span>
+            <h2
+              className="text-3xl sm:text-4xl font-bold text-white mb-5"
+              style={{ fontFamily: "'Playfair Display', serif" }}
+            >
+              Schedule Your VIP Consultation
+            </h2>
+            <p className="text-stone-400 text-lg leading-relaxed mb-10">
+              Fill out the form and your dedicated project manager will contact you
+              within 24 hours. No obligation, no pressure — just a genuine
+              conversation about your property.
+            </p>
+
+            {/* Benefits */}
+            <div className="space-y-5 mb-10">
+              {[
+                "Same-week on-site consultation",
+                "Detailed proposal within 48 hours",
+                "Transparent pricing — no hidden fees",
+                "Dedicated project manager assigned to you",
+              ].map((benefit) => (
+                <div key={benefit} className="flex items-center gap-3">
+                  <div className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+                    <CheckCircle2 className="w-3 h-3 text-amber-400" />
+                  </div>
+                  <span className="text-stone-300 text-[15px]">{benefit}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Direct Call Option */}
+            <div className="p-6 rounded-xl bg-stone-800/50 border border-stone-700/50">
+              <div className="text-sm text-stone-400 mb-2">Prefer to talk now?</div>
+              <a
+                href={`tel:${COMPANY.phone}`}
+                className="flex items-center gap-3 text-white font-semibold text-lg hover:text-amber-300 transition-colors"
+              >
+                <Phone className="w-5 h-5 text-amber-400" />
+                {COMPANY.phone}
+              </a>
+            </div>
+          </div>
+
+          {/* Right - Form */}
+          <form
+            onSubmit={handleSubmit}
+            className="bg-white rounded-2xl p-8 sm:p-10 shadow-2xl shadow-black/20"
+          >
+            <div className="grid sm:grid-cols-2 gap-5">
+              {CONSULTATION_FORM_FIELDS.map((field) => {
+                if (field.type === "textarea") {
+                  return (
+                    <div key={field.name} className="sm:col-span-2">
+                      <Label className="text-stone-700 font-medium text-sm mb-2 block">
+                        {field.label}
+                        {field.required && <span className="text-amber-600 ml-1">*</span>}
+                      </Label>
+                      <Textarea
+                        placeholder={field.placeholder}
+                        value={formData[field.name] || ""}
+                        onChange={(e) => handleChange(field.name, e.target.value)}
+                        className="border-stone-200 focus:border-amber-500 focus:ring-amber-500/20 min-h-[100px] rounded-lg resize-none"
+                      />
+                    </div>
+                  );
+                }
+
+                if (field.type === "select") {
+                  return (
+                    <div key={field.name} className={field.name === "address" ? "sm:col-span-2" : ""}>
+                      <Label className="text-stone-700 font-medium text-sm mb-2 block">
+                        {field.label}
+                        {field.required && <span className="text-amber-600 ml-1">*</span>}
+                      </Label>
+                      <Select
+                        value={formData[field.name] || ""}
+                        onValueChange={(val) => handleChange(field.name, val)}
+                      >
+                        <SelectTrigger className="border-stone-200 focus:border-amber-500 focus:ring-amber-500/20 rounded-lg h-11">
+                          <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {field.options.map((opt) => (
+                            <SelectItem key={opt} value={opt}>
+                              {opt}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div key={field.name} className={field.name === "address" ? "sm:col-span-2" : ""}>
+                    <Label className="text-stone-700 font-medium text-sm mb-2 block">
+                      {field.label}
+                      {field.required && <span className="text-amber-600 ml-1">*</span>}
+                    </Label>
+                    <Input
+                      type={field.type}
+                      placeholder={field.placeholder}
+                      value={formData[field.name] || ""}
+                      onChange={(e) => handleChange(field.name, e.target.value)}
+                      className="border-stone-200 focus:border-amber-500 focus:ring-amber-500/20 rounded-lg h-11"
+                    />
+                  </div>
+                );
+              })}
+            </div>
+
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full mt-8 bg-amber-700 hover:bg-amber-800 text-white py-6 text-base font-semibold rounded-lg shadow-lg shadow-amber-700/20 transition-all duration-300 hover:shadow-amber-800/30 group disabled:opacity-70"
+            >
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Submitting...
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  Schedule My VIP Consultation
+                  <Send className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                </span>
+              )}
+            </Button>
+
+            <p className="text-center text-stone-400 text-xs mt-4">
+              No spam. No obligation. Your information is kept strictly confidential.
+            </p>
+          </form>
+        </div>
+      </div>
+    </section>
+  );
+};
