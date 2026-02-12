@@ -136,13 +136,18 @@ export const WhyNotFreeSection = () => {
                   Book Your VIP Consultation — $150
                   <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-0.5" />
                 </Button>
+                {/* Mobile: click-to-call | Desktop: just display number */}
                 <a
                   href={`tel:${COMPANY.phone.replace(/[^0-9]/g, "")}`}
-                  className="flex items-center justify-center gap-2 w-full py-4 rounded-lg border border-stone-600 text-stone-300 hover:text-white hover:border-stone-500 hover:bg-stone-700/30 transition-all duration-200 font-medium text-sm"
+                  className="flex md:hidden items-center justify-center gap-2 w-full py-4 rounded-lg border border-stone-600 text-stone-300 hover:text-white hover:border-stone-500 hover:bg-stone-700/30 transition-all duration-200 font-medium text-sm"
                 >
                   <Phone className="w-4 h-4" />
-                  Or call now: {COMPANY.phone}
+                  Call now: {COMPANY.phone}
                 </a>
+                <div className="hidden md:flex items-center justify-center gap-2 w-full py-4 rounded-lg text-stone-400 font-medium text-sm">
+                  <Phone className="w-4 h-4 text-stone-500" />
+                  Or call us: {COMPANY.phone}
+                </div>
               </div>
             </div>
           </div>
