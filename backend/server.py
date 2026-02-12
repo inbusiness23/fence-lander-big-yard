@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException, Request
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -22,6 +22,7 @@ db = client[os.environ['DB_NAME']]
 
 # Stripe
 stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
+STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
 VIP_CONSULTATION_FEE = 15000  # $150.00 in cents
 
 # GHL
@@ -33,6 +34,7 @@ GHL_BASE_URL = "https://services.leadconnectorhq.com"
 GHL_LEAD_SOURCE = "ASAP Large Yard LP"
 GHL_CONSULTATION_TAG = "LP-VIP-Consultation"
 GHL_CALLBACK_TAG = "LP-Callback-Request"
+GHL_PAID_TAG = "LP-Paid-$150"
 
 # Create the main app
 app = FastAPI()
