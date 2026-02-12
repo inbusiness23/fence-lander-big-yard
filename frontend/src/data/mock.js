@@ -1,7 +1,7 @@
 export const COMPANY = {
   name: "ASAP Fence & Gates",
   division: "Large Yard Division",
-  phone: "(407) 555-0182",
+  phone: "(321) 486-6414",
   email: "vip@asapfencegates.com",
   address: "Seminole County, Florida",
   tagline: "Premium Fencing for Exceptional Properties",
