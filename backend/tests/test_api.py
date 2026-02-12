@@ -91,12 +91,66 @@ class TestConsultationEndpoint:
         print(f"✓ Consultation created with ID: {data['id']}")
         print(f"✓ Stripe checkout URL returned: {data['checkoutUrl'][:50]}...")
     
+    def test_create_consultation_without_phone(self):
+        """Test consultation works WITHOUT phone (phone is now optional)"""
+        consultation_data = {
+            "fullName": f"TEST_NoPhone_{uuid.uuid4().hex[:6]}",
+            "email": "nophone@gmail.com",
+            "address": "123 Oak Street, Lake Mary, FL",
+            "yardSize": "½ – ¾ Acre",
+            "projectType": "New Fence Installation",
+            "smsConsent": False,
+            "originUrl": "https://asap-fence-vip.preview.emergentagent.com"
+        }
+        response = requests.post(f"{BASE_URL}/api/consultations", json=consultation_data)
+        assert response.status_code == 200
+        data = response.json()
+        assert "checkoutUrl" in data
+        assert "id" in data
+        print("✓ Consultation WITHOUT phone works (phone is optional)")
+    
+    def test_create_consultation_with_sms_consent(self):
+        """Test consultation with SMS consent = true and timestamp"""
+        consultation_data = {
+            "fullName": f"TEST_SMSConsent_{uuid.uuid4().hex[:6]}",
+            "email": "smsconsent@gmail.com",
+            "phone": "(321) 555-1234",
+            "address": "456 Pine Ave, Sanford, FL",
+            "yardSize": "¾ – 1 Acre",
+            "projectType": "Fence Replacement",
+            "smsConsent": True,
+            "smsConsentTimestamp": "2026-02-12T17:00:00.000Z",
+            "originUrl": "https://asap-fence-vip.preview.emergentagent.com"
+        }
+        response = requests.post(f"{BASE_URL}/api/consultations", json=consultation_data)
+        assert response.status_code == 200
+        data = response.json()
+        assert "checkoutUrl" in data
+        print("✓ Consultation with smsConsent=true and timestamp works")
+    
+    def test_create_consultation_without_sms_consent(self):
+        """Test consultation with SMS consent = false (default)"""
+        consultation_data = {
+            "fullName": f"TEST_NoSMS_{uuid.uuid4().hex[:6]}",
+            "email": "nosmsconsent@gmail.com",
+            "phone": "(321) 555-5678",
+            "address": "789 Maple Dr, Oviedo, FL",
+            "yardSize": "¼ – ½ Acre",
+            "projectType": "Both — Replace & Extend",
+            "smsConsent": False,
+            "originUrl": "https://asap-fence-vip.preview.emergentagent.com"
+        }
+        response = requests.post(f"{BASE_URL}/api/consultations", json=consultation_data)
+        assert response.status_code == 200
+        data = response.json()
+        assert "checkoutUrl" in data
+        print("✓ Consultation with smsConsent=false works")
+    
     def test_create_consultation_required_fields_only(self):
-        """Test consultation with only required fields"""
+        """Test consultation with only required fields (no phone, no optional fields)"""
         consultation_data = {
             "fullName": f"TEST_MinFields_{uuid.uuid4().hex[:6]}",
             "email": "minimal@test.com",
-            "phone": "(321) 555-0000",
             "address": "789 Oak Ave, Lake Mary, FL 32746",
             "yardSize": "¼ – ½ Acre",
             "projectType": "Fence Replacement",
@@ -106,14 +160,14 @@ class TestConsultationEndpoint:
         assert response.status_code == 200
         data = response.json()
         assert "checkoutUrl" in data
-        print("✓ Consultation with required fields only works")
+        print("✓ Consultation with required fields only works (no phone)")
     
     def test_create_consultation_missing_required_field(self):
         """Test consultation fails without required fields"""
         consultation_data = {
             "fullName": "Test User",
             "email": "test@test.com",
-            # Missing phone, address, yardSize, projectType
+            # Missing address, yardSize, projectType (phone is now optional)
             "originUrl": "https://example.com"
         }
         response = requests.post(f"{BASE_URL}/api/consultations", json=consultation_data)
