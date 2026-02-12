@@ -51,7 +51,7 @@ export const HeroSection = () => {
 
   return (
     <>
-      <section className="relative min-h-[100vh] flex items-center overflow-hidden">
+      <section data-testid="hero-section" className="relative min-h-[100vh] flex items-center overflow-hidden">
         {/* Background */}
         <div className="absolute inset-0">
           <img
@@ -102,11 +102,12 @@ export const HeroSection = () => {
               <div
                 className="hidden md:flex items-center gap-2.5 px-8 py-4 rounded-lg bg-white text-stone-900 font-bold text-base cursor-pointer shadow-xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-stone-50 select-none"
                 onClick={() => setCallbackOpen(true)}
+                data-testid="hero-phone-desktop"
               >
                 <Phone className="w-5 h-5 text-amber-700" />
                 {COMPANY.phone}
               </div>
-              <a href={`tel:${COMPANY.phone.replace(/[^0-9]/g, "")}`} className="md:hidden">
+              <a href={`tel:${COMPANY.phone.replace(/[^0-9]/g, "")}`} className="md:hidden" data-testid="hero-phone-mobile">
                 <Button className="w-full bg-white text-stone-900 hover:bg-stone-100 px-8 py-6 text-base font-bold rounded-lg shadow-xl">
                   <Phone className="w-5 h-5 mr-2.5 text-amber-700" />
                   Call {COMPANY.phone}
@@ -114,6 +115,7 @@ export const HeroSection = () => {
               </a>
 
               <Button
+                data-testid="hero-book-consultation-btn"
                 onClick={() => scrollTo("consultation")}
                 className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-6 text-base font-semibold rounded-lg shadow-xl shadow-amber-600/25 transition-all duration-300 hover:shadow-amber-700/35 hover:-translate-y-0.5 group"
               >
@@ -199,6 +201,7 @@ export const HeroSection = () => {
                 </div>
                 <Button
                   type="submit"
+                  data-testid="hero-callback-submit-btn"
                   className="w-full bg-amber-700 hover:bg-amber-800 text-white py-5 text-sm font-semibold rounded-lg shadow-lg shadow-amber-700/20 transition-all duration-200 group"
                 >
                   <Phone className="w-4 h-4 mr-2" />
