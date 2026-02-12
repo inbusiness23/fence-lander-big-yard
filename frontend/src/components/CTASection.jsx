@@ -83,7 +83,7 @@ export const CTASection = () => {
 
         <div className="grid lg:grid-cols-[1fr_1.2fr] gap-8 lg:gap-16 items-start">
           {/* Left - Info (hidden on mobile, shown on desktop) */}
-          <div className="hidden lg:block">
+          <div className="hidden lg:block min-w-0">
             <span className="inline-block text-amber-400 text-sm font-semibold uppercase tracking-[0.15em] mb-4">
               Start Your Project
             </span>
@@ -171,7 +171,7 @@ export const CTASection = () => {
           </div>
 
           {/* Right - Form (shows FIRST on mobile via order) */}
-          <div id="consultation-form">
+          <div id="consultation-form" className="min-w-0">
             {step === 1 ? (
               <form
                 onSubmit={handleStep1Submit}
