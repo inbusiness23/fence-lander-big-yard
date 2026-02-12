@@ -222,7 +222,7 @@ export const FAQ_ITEMS = [
 export const CONSULTATION_FORM_FIELDS = [
   { name: "fullName", label: "Full Name", type: "text", placeholder: "Your full name", required: true },
   { name: "email", label: "Email", type: "email", placeholder: "your@email.com", required: true },
-  { name: "phone", label: "Phone", type: "tel", placeholder: "(407) 555-0000", required: true },
+  { name: "phone", label: "Phone", type: "tel", placeholder: "(407) 555-0000", required: false },
   { name: "address", label: "Property Address", type: "text", placeholder: "Your property address in Seminole County", required: true },
   { name: "yardSize", label: "Estimated Yard Size", type: "select", options: ["¼ – ½ Acre", "½ – ¾ Acre", "¾ – 1 Acre", "1+ Acre"], required: true },
   { name: "projectType", label: "Project Type", type: "select", options: ["New Fence Installation", "Fence Replacement", "Both — Replace & Extend"], required: true },
