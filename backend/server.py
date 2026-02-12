@@ -97,7 +97,7 @@ async def push_to_ghl(data: dict, lead_type: str = "consultation"):
         if data.get("projectType"):
             tags.append(f"Project: {data['projectType']}")
         if data.get("paymentStatus") == "PAID - $150":
-            tags.append("Paid-$150")
+            tags.append(GHL_PAID_TAG)
 
         # Notes for the contact
         notes = []
