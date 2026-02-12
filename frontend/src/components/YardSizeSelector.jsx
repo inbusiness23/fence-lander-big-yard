@@ -127,14 +127,15 @@ export const YardSizeSelector = () => {
         {/* Selected VIP Message */}
         {selected && (
           <div className="mt-8 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800">
+            <div className="inline-flex flex-col sm:flex-row items-center gap-3 px-6 sm:px-8 py-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800">
               <Sparkles className="w-5 h-5 text-amber-600" />
               <span className="font-medium">
                 {YARD_SIZES.find((y) => y.id === selected)?.message}
               </span>
               <Button
+                data-testid="yard-size-book-btn"
                 onClick={() => scrollTo("consultation")}
-                className="ml-2 bg-amber-700 hover:bg-amber-800 text-white text-sm px-5 py-2 rounded-lg transition-all duration-200 group"
+                className="ml-0 sm:ml-2 bg-amber-700 hover:bg-amber-800 text-white text-sm px-5 py-2 rounded-lg transition-all duration-200 group"
               >
                 Book VIP Consultation — $150
                 <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-0.5" />
