@@ -101,14 +101,33 @@ export const CTASection = () => {
             </p>
 
             {/* $150 Fee Box */}
-            <div className="p-5 rounded-xl bg-amber-500/10 border border-amber-500/20 mb-8">
-              <div className="flex items-baseline gap-2 mb-2">
+            <div className="p-6 rounded-xl bg-amber-500/10 border border-amber-500/20 mb-8">
+              <div className="flex items-baseline gap-2 mb-3">
                 <span className="text-3xl font-bold text-amber-300" style={{ fontFamily: "'Playfair Display', serif" }}>$150</span>
                 <span className="text-amber-400/80 text-sm font-medium">VIP Consultation Fee</span>
               </div>
+              <p className="text-stone-300 text-[15px] leading-relaxed mb-3">
+                This isn't a typical "free estimate." The $150 fee is how we filter out tire kickers and dedicate 
+                <span className="text-amber-300 font-semibold"> real time, real resources, and our full attention</span> to 
+                homeowners who are serious about their fence project.
+              </p>
               <p className="text-stone-400 text-sm leading-relaxed">
-                Your $150 is <span className="text-amber-300 font-semibold">credited in full</span> toward your fence installation. 
-                It's our way of ensuring we dedicate real time and resources to your property.
+                When you move forward, the <span className="text-amber-300 font-semibold">entire $150 is credited toward your installation</span> — 
+                so it costs you nothing. You get a thorough on-site assessment, material samples brought to your property, 
+                and a detailed custom proposal within 48 hours.
+              </p>
+            </div>
+
+            {/* Financing */}
+            <div className="p-5 rounded-xl bg-stone-800/60 border border-stone-700/50 mb-8">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-8 h-8 rounded-full bg-amber-500/15 flex items-center justify-center flex-shrink-0">
+                  <span className="text-amber-400 text-sm font-bold">$</span>
+                </div>
+                <span className="text-white font-semibold text-sm">Pay-Over-Time Options Available</span>
+              </div>
+              <p className="text-stone-400 text-sm leading-relaxed ml-11">
+                Spread your fence investment over time with our easy-to-apply financing. Most homeowners are approved quickly with competitive rates. Ask your project manager for details.
               </p>
             </div>
 
