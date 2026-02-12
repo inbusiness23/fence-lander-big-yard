@@ -197,5 +197,69 @@ class TestConsultationStatusEndpoint:
         print("✓ Invalid session correctly returns 404")
 
 
+class TestStripeWebhook:
+    """Stripe webhook endpoint tests - new feature for real-time payment updates"""
+    
+    def test_webhook_checkout_completed(self):
+        """Test stripe-webhook accepts checkout.session.completed events"""
+        payload = {
+            "type": "checkout.session.completed",
+            "data": {
+                "object": {
+                    "payment_status": "paid",
+                    "metadata": {
+                        "consultation_id": "test-webhook-id-123"
+                    }
+                }
+            }
+        }
+        response = requests.post(f"{BASE_URL}/api/stripe-webhook", json=payload)
+        assert response.status_code == 200
+        data = response.json()
+        assert data.get("received") == True
+        print("✓ Webhook checkout.session.completed returns {received: true}")
+    
+    def test_webhook_async_payment_succeeded(self):
+        """Test stripe-webhook accepts async_payment_succeeded events"""
+        payload = {
+            "type": "checkout.session.async_payment_succeeded",
+            "data": {
+                "object": {
+                    "payment_status": "paid",
+                    "metadata": {
+                        "consultation_id": "test-async-id-456"
+                    }
+                }
+            }
+        }
+        response = requests.post(f"{BASE_URL}/api/stripe-webhook", json=payload)
+        assert response.status_code == 200
+        data = response.json()
+        assert data.get("received") == True
+        print("✓ Webhook checkout.session.async_payment_succeeded works")
+    
+    def test_webhook_unknown_event(self):
+        """Test webhook handles unknown event types gracefully"""
+        payload = {
+            "type": "unknown.event.type",
+            "data": {"object": {}}
+        }
+        response = requests.post(f"{BASE_URL}/api/stripe-webhook", json=payload)
+        assert response.status_code == 200
+        data = response.json()
+        assert data.get("received") == True
+        print("✓ Webhook handles unknown events gracefully")
+    
+    def test_webhook_invalid_payload(self):
+        """Test webhook rejects invalid JSON"""
+        response = requests.post(
+            f"{BASE_URL}/api/stripe-webhook", 
+            data="not valid json",
+            headers={"Content-Type": "application/json"}
+        )
+        assert response.status_code == 400
+        print("✓ Webhook rejects invalid payload with 400")
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "--tb=short"])
