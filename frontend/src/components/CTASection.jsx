@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRight, Send, Phone, CheckCircle2, ShieldCheck } from "lucide-react";
+import { ArrowRight, Send, Phone, CheckCircle2, ShieldCheck, ArrowLeft, Lock, CreditCard } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -13,72 +13,55 @@ import {
 import { Label } from "./ui/label";
 import { CONSULTATION_FORM_FIELDS, COMPANY, SATISFACTION_GUARANTEE } from "../data/mock";
 import { toast } from "sonner";
+import axios from "axios";
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 export const CTASection = () => {
   const [formData, setFormData] = useState({});
-  const [submitted, setSubmitted] = useState(false);
+  const [step, setStep] = useState(1); // 1 = lead capture, 2 = review & pay
   const [loading, setLoading] = useState(false);
 
   const handleChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleStep1Submit = (e) => {
     e.preventDefault();
-
-    // Basic validation
+    // Validate required fields
     const requiredFields = CONSULTATION_FORM_FIELDS.filter((f) => f.required);
     const missing = requiredFields.filter((f) => !formData[f.name]);
     if (missing.length > 0) {
       toast.error(`Please fill in: ${missing.map((f) => f.label).join(", ")}`);
       return;
     }
-
-    setLoading(true);
-    // Simulate submission (frontend-only mock)
-    setTimeout(() => {
-      setLoading(false);
-      setSubmitted(true);
-      // Store in localStorage as mock
-      const existing = JSON.parse(localStorage.getItem("consultations") || "[]");
-      existing.push({ ...formData, timestamp: new Date().toISOString() });
-      localStorage.setItem("consultations", JSON.stringify(existing));
-      toast.success("Consultation request submitted!");
-    }, 1500);
+    setStep(2);
+    // Scroll to top of consultation section
+    document.getElementById("consultation")?.scrollIntoView({ behavior: "smooth" });
   };
 
-  if (submitted) {
-    return (
-      <section className="py-24 bg-stone-900" id="consultation">
-        <div className="max-w-2xl mx-auto px-6 lg:px-8 text-center">
-          <div className="w-20 h-20 rounded-full bg-amber-500/20 flex items-center justify-center mx-auto mb-8">
-            <CheckCircle2 className="w-10 h-10 text-amber-400" />
-          </div>
-          <h2
-            className="text-3xl sm:text-4xl font-bold text-white mb-4"
-            style={{ fontFamily: "'Playfair Display', serif" }}
-          >
-            We'll Be in Touch Soon
-          </h2>
-          <p className="text-stone-400 text-lg leading-relaxed mb-8">
-            Your dedicated project manager will reach out within hours to schedule
-            your on-site consultation — typically the same day or next business day. 
-            Your $150 VIP consultation fee will be credited toward your project.
-          </p>
-          <Button
-            onClick={() => {
-              setSubmitted(false);
-              setFormData({});
-            }}
-            variant="outline"
-            className="border-stone-600 text-stone-300 hover:bg-stone-800 hover:text-white"
-          >
-            Submit Another Request
-          </Button>
-        </div>
-      </section>
-    );
-  }
+  const handlePayment = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.post(`${API}/consultations`, {
+        ...formData,
+        originUrl: window.location.origin,
+      });
+
+      if (response.data.checkoutUrl) {
+        // Redirect to Stripe Checkout
+        window.location.href = response.data.checkoutUrl;
+      } else {
+        toast.error("Failed to create checkout session");
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+      toast.error(error.response?.data?.detail || "Something went wrong. Please try again.");
+      setLoading(false);
+    }
+  };
 
   return (
     <section className="py-24 bg-stone-900" id="consultation">
@@ -96,25 +79,25 @@ export const CTASection = () => {
               Book Your VIP Consultation
             </h2>
             <p className="text-stone-400 text-lg leading-relaxed mb-6">
-              Fill out the form and your dedicated project manager will contact you
-              within hours to schedule your on-site visit — typically the same day or next business day.
+              {step === 1
+                ? "Fill out the form and your dedicated project manager will contact you within hours to schedule your on-site visit — typically the same day or next business day."
+                : "Review your information below and proceed to secure payment. Your $150 is credited in full toward your fence project."}
             </p>
 
             {/* $150 Fee Box */}
-            <div className="p-6 rounded-xl bg-amber-500/10 border border-amber-500/20 mb-8">
+            <div className="p-6 rounded-xl bg-amber-500/10 border border-amber-500/20 mb-6">
               <div className="flex items-baseline gap-2 mb-3">
                 <span className="text-3xl font-bold text-amber-300" style={{ fontFamily: "'Playfair Display', serif" }}>$150</span>
                 <span className="text-amber-400/80 text-sm font-medium">VIP Consultation Fee</span>
               </div>
               <p className="text-stone-300 text-[15px] leading-relaxed mb-3">
-                This isn't a typical "free estimate." The $150 fee is how we filter out tire kickers and dedicate 
-                <span className="text-amber-300 font-semibold"> real time, real resources, and our full attention</span> to 
+                This isn't a typical "free estimate." The $150 fee is how we filter out tire kickers and dedicate
+                <span className="text-amber-300 font-semibold"> real time, real resources, and our full attention</span> to
                 homeowners who are serious about their fence project.
               </p>
               <p className="text-stone-400 text-sm leading-relaxed">
-                When you move forward, the <span className="text-amber-300 font-semibold">entire $150 is credited toward your installation</span> — 
-                so it costs you nothing. You get a thorough on-site assessment, material samples brought to your property, 
-                and a detailed custom proposal within 48 hours.
+                When you move forward, the <span className="text-amber-300 font-semibold">entire $150 is credited toward your installation</span> —
+                so it costs you nothing.
               </p>
             </div>
 
@@ -145,7 +128,7 @@ export const CTASection = () => {
             </div>
 
             {/* Benefits */}
-            <div className="space-y-5 mb-10">
+            <div className="space-y-5 mb-8">
               {[
                 "Same-day or next-day on-site consultation",
                 "$150 fee credited toward your installation",
@@ -167,104 +150,224 @@ export const CTASection = () => {
               <div className="text-sm text-stone-400 mb-3">Ready to talk? Skip the form.</div>
               <a
                 href={`tel:${COMPANY.phone.replace(/[^0-9]/g, "")}`}
-                className="flex items-center justify-center gap-3 w-full py-4 rounded-lg bg-white text-stone-900 font-bold text-lg hover:bg-stone-100 transition-all duration-200 shadow-lg"
+                className="md:hidden flex items-center justify-center gap-3 w-full py-4 rounded-lg bg-white text-stone-900 font-bold text-lg hover:bg-stone-100 transition-all duration-200 shadow-lg"
               >
                 <Phone className="w-5 h-5 text-amber-700" />
                 {COMPANY.phone}
               </a>
+              <div className="hidden md:flex items-center gap-3 text-stone-300 font-semibold text-lg">
+                <Phone className="w-5 h-5 text-amber-400" />
+                {COMPANY.phone}
+              </div>
             </div>
           </div>
 
-          {/* Right - Form */}
-          <form
-            onSubmit={handleSubmit}
-            className="bg-white rounded-2xl p-8 sm:p-10 shadow-2xl shadow-black/20"
-          >
-            <div className="grid sm:grid-cols-2 gap-5">
-              {CONSULTATION_FORM_FIELDS.map((field) => {
-                if (field.type === "textarea") {
-                  return (
-                    <div key={field.name} className="sm:col-span-2">
-                      <Label className="text-stone-700 font-medium text-sm mb-2 block">
-                        {field.label}
-                        {field.required && <span className="text-amber-600 ml-1">*</span>}
-                      </Label>
-                      <Textarea
-                        placeholder={field.placeholder}
-                        value={formData[field.name] || ""}
-                        onChange={(e) => handleChange(field.name, e.target.value)}
-                        className="border-stone-200 focus:border-amber-500 focus:ring-amber-500/20 min-h-[100px] rounded-lg resize-none"
-                      />
-                    </div>
-                  );
-                }
+          {/* Right - Step 1: Form | Step 2: Review & Pay */}
+          {step === 1 ? (
+            <form
+              onSubmit={handleStep1Submit}
+              className="bg-white rounded-2xl p-8 sm:p-10 shadow-2xl shadow-black/20"
+            >
+              {/* Step indicator */}
+              <div className="flex items-center gap-3 mb-8">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center text-sm font-bold">1</div>
+                  <span className="text-sm font-semibold text-stone-800">Your Details</span>
+                </div>
+                <div className="flex-1 h-px bg-stone-200" />
+                <div className="flex items-center gap-2 opacity-40">
+                  <div className="w-8 h-8 rounded-full bg-stone-200 text-stone-500 flex items-center justify-center text-sm font-bold">2</div>
+                  <span className="text-sm font-medium text-stone-400">Secure Payment</span>
+                </div>
+              </div>
 
-                if (field.type === "select") {
+              <div className="grid sm:grid-cols-2 gap-5">
+                {CONSULTATION_FORM_FIELDS.map((field) => {
+                  if (field.type === "textarea") {
+                    return (
+                      <div key={field.name} className="sm:col-span-2">
+                        <Label className="text-stone-700 font-medium text-sm mb-2 block">
+                          {field.label}
+                          {field.required && <span className="text-amber-600 ml-1">*</span>}
+                        </Label>
+                        <Textarea
+                          placeholder={field.placeholder}
+                          value={formData[field.name] || ""}
+                          onChange={(e) => handleChange(field.name, e.target.value)}
+                          className="border-stone-200 focus:border-amber-500 focus:ring-amber-500/20 min-h-[100px] rounded-lg resize-none"
+                        />
+                      </div>
+                    );
+                  }
+
+                  if (field.type === "select") {
+                    return (
+                      <div key={field.name} className={field.name === "address" ? "sm:col-span-2" : ""}>
+                        <Label className="text-stone-700 font-medium text-sm mb-2 block">
+                          {field.label}
+                          {field.required && <span className="text-amber-600 ml-1">*</span>}
+                        </Label>
+                        <Select
+                          value={formData[field.name] || ""}
+                          onValueChange={(val) => handleChange(field.name, val)}
+                        >
+                          <SelectTrigger className="border-stone-200 focus:border-amber-500 focus:ring-amber-500/20 rounded-lg h-11">
+                            <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {field.options.map((opt) => (
+                              <SelectItem key={opt} value={opt}>
+                                {opt}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    );
+                  }
+
                   return (
                     <div key={field.name} className={field.name === "address" ? "sm:col-span-2" : ""}>
                       <Label className="text-stone-700 font-medium text-sm mb-2 block">
                         {field.label}
                         {field.required && <span className="text-amber-600 ml-1">*</span>}
                       </Label>
-                      <Select
+                      <Input
+                        type={field.type}
+                        placeholder={field.placeholder}
                         value={formData[field.name] || ""}
-                        onValueChange={(val) => handleChange(field.name, val)}
-                      >
-                        <SelectTrigger className="border-stone-200 focus:border-amber-500 focus:ring-amber-500/20 rounded-lg h-11">
-                          <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {field.options.map((opt) => (
-                            <SelectItem key={opt} value={opt}>
-                              {opt}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        onChange={(e) => handleChange(field.name, e.target.value)}
+                        className="border-stone-200 focus:border-amber-500 focus:ring-amber-500/20 rounded-lg h-11"
+                      />
                     </div>
                   );
-                }
+                })}
+              </div>
 
-                return (
-                  <div key={field.name} className={field.name === "address" ? "sm:col-span-2" : ""}>
-                    <Label className="text-stone-700 font-medium text-sm mb-2 block">
-                      {field.label}
-                      {field.required && <span className="text-amber-600 ml-1">*</span>}
-                    </Label>
-                    <Input
-                      type={field.type}
-                      placeholder={field.placeholder}
-                      value={formData[field.name] || ""}
-                      onChange={(e) => handleChange(field.name, e.target.value)}
-                      className="border-stone-200 focus:border-amber-500 focus:ring-amber-500/20 rounded-lg h-11"
-                    />
+              <Button
+                type="submit"
+                className="w-full mt-8 bg-amber-700 hover:bg-amber-800 text-white py-6 text-base font-semibold rounded-lg shadow-lg shadow-amber-700/20 transition-all duration-300 hover:shadow-amber-800/30 group"
+              >
+                Continue to Secure Payment — $150
+                <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-0.5" />
+              </Button>
+
+              <p className="text-center text-stone-400 text-xs mt-4">
+                $150 consultation fee is fully credited toward your project. No spam. No obligation.
+              </p>
+            </form>
+          ) : (
+            /* Step 2: Review & Pay */
+            <div className="bg-white rounded-2xl p-8 sm:p-10 shadow-2xl shadow-black/20">
+              {/* Step indicator */}
+              <div className="flex items-center gap-3 mb-8">
+                <div className="flex items-center gap-2 opacity-60">
+                  <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-sm font-bold">
+                    <CheckCircle2 className="w-4 h-4" />
                   </div>
-                );
-              })}
+                  <span className="text-sm font-medium text-stone-500">Your Details</span>
+                </div>
+                <div className="flex-1 h-px bg-amber-300" />
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center text-sm font-bold">2</div>
+                  <span className="text-sm font-semibold text-stone-800">Secure Payment</span>
+                </div>
+              </div>
+
+              {/* Summary */}
+              <div className="bg-stone-50 rounded-xl p-6 mb-6 border border-stone-100">
+                <h3 className="text-sm font-semibold text-stone-500 uppercase tracking-wider mb-4">Consultation Details</h3>
+                <div className="grid sm:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-stone-400 block">Name</span>
+                    <span className="text-stone-800 font-medium">{formData.fullName}</span>
+                  </div>
+                  <div>
+                    <span className="text-stone-400 block">Email</span>
+                    <span className="text-stone-800 font-medium">{formData.email}</span>
+                  </div>
+                  <div>
+                    <span className="text-stone-400 block">Phone</span>
+                    <span className="text-stone-800 font-medium">{formData.phone}</span>
+                  </div>
+                  <div>
+                    <span className="text-stone-400 block">Property</span>
+                    <span className="text-stone-800 font-medium">{formData.address}</span>
+                  </div>
+                  <div>
+                    <span className="text-stone-400 block">Yard Size</span>
+                    <span className="text-stone-800 font-medium">{formData.yardSize}</span>
+                  </div>
+                  <div>
+                    <span className="text-stone-400 block">Project</span>
+                    <span className="text-stone-800 font-medium">{formData.projectType}</span>
+                  </div>
+                  {formData.fenceStyle && (
+                    <div>
+                      <span className="text-stone-400 block">Fence Style</span>
+                      <span className="text-stone-800 font-medium">{formData.fenceStyle}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Payment Summary */}
+              <div className="bg-amber-50 rounded-xl p-6 mb-6 border border-amber-100">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-stone-700 font-medium">VIP Consultation Fee</span>
+                  <span className="text-2xl font-bold text-stone-900" style={{ fontFamily: "'Playfair Display', serif" }}>$150.00</span>
+                </div>
+                <div className="flex items-center gap-2 text-amber-700 text-sm">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-medium">Credited in full toward your fence installation</span>
+                </div>
+              </div>
+
+              {/* Guarantee */}
+              <div className="flex items-start gap-3 bg-emerald-50 border border-emerald-100 rounded-xl p-4 mb-6">
+                <ShieldCheck className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <span className="text-emerald-800 text-sm font-semibold">{SATISFACTION_GUARANTEE.headline}</span>
+                  <p className="text-emerald-700/70 text-xs mt-1">
+                    Not satisfied with your consultation? We'll refund the full $150 — no questions asked.
+                  </p>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <Button
+                onClick={handlePayment}
+                disabled={loading}
+                className="w-full bg-amber-700 hover:bg-amber-800 text-white py-6 text-base font-semibold rounded-lg shadow-lg shadow-amber-700/20 transition-all duration-300 hover:shadow-amber-800/30 group disabled:opacity-70 mb-3"
+              >
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Connecting to secure checkout...
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    <Lock className="w-4 h-4" />
+                    Pay $150 — Proceed to Secure Checkout
+                    <CreditCard className="w-4 h-4 ml-1" />
+                  </span>
+                )}
+              </Button>
+
+              <button
+                onClick={() => setStep(1)}
+                className="flex items-center justify-center gap-2 w-full py-3 text-stone-500 text-sm font-medium hover:text-stone-700 transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to edit details
+              </button>
+
+              <div className="flex items-center justify-center gap-2 mt-4 text-stone-400 text-xs">
+                <Lock className="w-3 h-3" />
+                <span>Secured by Stripe. Your payment info is never stored on our servers.</span>
+              </div>
             </div>
-
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full mt-8 bg-amber-700 hover:bg-amber-800 text-white py-6 text-base font-semibold rounded-lg shadow-lg shadow-amber-700/20 transition-all duration-300 hover:shadow-amber-800/30 group disabled:opacity-70"
-            >
-              {loading ? (
-                <span className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Submitting...
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  Schedule My VIP Consultation — $150
-                  <Send className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-                </span>
-              )}
-            </Button>
-
-            <p className="text-center text-stone-400 text-xs mt-4">
-              $150 consultation fee is fully credited toward your project. No spam. No obligation.
-            </p>
-          </form>
+          )}
         </div>
       </div>
     </section>
