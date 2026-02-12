@@ -91,9 +91,8 @@ export const Footer = () => {
             &copy; {currentYear} {COMPANY.name}. All rights reserved.
           </div>
           <div className="flex items-center gap-6 text-stone-500 text-xs">
-            <span className="hover:text-stone-300 cursor-pointer transition-colors">Privacy Policy</span>
-            <span className="hover:text-stone-300 cursor-pointer transition-colors">Terms of Service</span>
-            <span className="hover:text-stone-300 cursor-pointer transition-colors">Sitemap</span>
+            <a href="/privacy" className="hover:text-stone-300 transition-colors">Privacy Policy</a>
+            <a href="/terms" className="hover:text-stone-300 transition-colors">Terms of Service</a>
           </div>
         </div>
       </div>
