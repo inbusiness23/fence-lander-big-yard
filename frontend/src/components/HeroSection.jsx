@@ -13,9 +13,7 @@ import {
 import { HERO, COMPANY, SATISFACTION_GUARANTEE } from "../data/mock";
 import { toast } from "sonner";
 import axios from "axios";
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+import { API, backendUrlHelpText, hasBackendUrl } from "../lib/api";
 
 export const HeroSection = () => {
   const [callbackOpen, setCallbackOpen] = useState(false);
@@ -31,6 +29,10 @@ export const HeroSection = () => {
     e.preventDefault();
     if (!callbackPhone.trim()) {
       toast.error("Please enter your phone number");
+      return;
+    }
+    if (!hasBackendUrl) {
+      toast.error(backendUrlHelpText);
       return;
     }
     axios.post(`${API}/callbacks`, { name: callbackName, phone: callbackPhone }).catch(() => {
