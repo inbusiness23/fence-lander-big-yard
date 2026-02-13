@@ -1,7 +1,6 @@
 from fastapi import FastAPI, APIRouter, HTTPException, Request
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
@@ -11,14 +10,12 @@ import uuid
 from datetime import datetime, timezone
 import stripe
 import httpx
+import sqlite3
+import threading
+from lead_router import router as lead_router_router
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
-
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
 
 # Stripe
 stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
@@ -42,6 +39,108 @@ api_router = APIRouter(prefix="/api")
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
+
+# SQLite (default local DB; no external database required)
+SQLITE_DB_PATH = os.environ.get("SQLITE_DB_PATH", str(ROOT_DIR / "app.db"))
+db_conn = sqlite3.connect(SQLITE_DB_PATH, check_same_thread=False)
+db_conn.row_factory = sqlite3.Row
+db_lock = threading.Lock()
+
+
+def _db_exec(query: str, params: tuple = ()) -> sqlite3.Cursor:
+    with db_lock:
+        cur = db_conn.execute(query, params)
+        db_conn.commit()
+        return cur
+
+
+def _db_one(query: str, params: tuple = ()) -> Optional[dict]:
+    with db_lock:
+        cur = db_conn.execute(query, params)
+        row = cur.fetchone()
+    return dict(row) if row else None
+
+
+def _db_many(query: str, params: tuple = ()) -> List[dict]:
+    with db_lock:
+        cur = db_conn.execute(query, params)
+        rows = cur.fetchall()
+    return [dict(r) for r in rows]
+
+
+def _normalize_consultation(doc: Optional[dict]) -> Optional[dict]:
+    if not doc:
+        return doc
+    doc["smsConsent"] = bool(doc.get("smsConsent"))
+    return doc
+
+
+def _init_sqlite() -> None:
+    with db_lock:
+        db_conn.executescript(
+            """
+            CREATE TABLE IF NOT EXISTS status_checks (
+                id TEXT PRIMARY KEY,
+                client_name TEXT NOT NULL,
+                timestamp TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS consultations (
+                id TEXT PRIMARY KEY,
+                fullName TEXT NOT NULL,
+                email TEXT NOT NULL,
+                phone TEXT,
+                address TEXT NOT NULL,
+                yardSize TEXT NOT NULL,
+                projectType TEXT NOT NULL,
+                fenceStyle TEXT,
+                timeline TEXT,
+                message TEXT,
+                smsConsent INTEGER NOT NULL DEFAULT 0,
+                smsConsentTimestamp TEXT,
+                status TEXT NOT NULL,
+                paymentStatus TEXT NOT NULL,
+                leadSource TEXT,
+                createdAt TEXT NOT NULL,
+                ghlContactId TEXT,
+                stripeSessionId TEXT,
+                paidAt TEXT
+            );
+
+            CREATE TABLE IF NOT EXISTS payment_transactions (
+                id TEXT PRIMARY KEY,
+                session_id TEXT NOT NULL UNIQUE,
+                consultation_id TEXT NOT NULL,
+                amount INTEGER NOT NULL,
+                currency TEXT NOT NULL,
+                payment_status TEXT NOT NULL,
+                status TEXT NOT NULL,
+                createdAt TEXT NOT NULL,
+                updatedAt TEXT
+            );
+
+            CREATE TABLE IF NOT EXISTS callbacks (
+                id TEXT PRIMARY KEY,
+                name TEXT,
+                phone TEXT NOT NULL,
+                status TEXT NOT NULL,
+                leadSource TEXT,
+                createdAt TEXT NOT NULL
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_consultations_createdAt ON consultations(createdAt DESC);
+            CREATE INDEX IF NOT EXISTS idx_consultations_stripeSessionId ON consultations(stripeSessionId);
+            CREATE INDEX IF NOT EXISTS idx_consultations_paymentStatus ON consultations(paymentStatus);
+            CREATE INDEX IF NOT EXISTS idx_payments_session_id ON payment_transactions(session_id);
+            CREATE INDEX IF NOT EXISTS idx_payments_consultation_id ON payment_transactions(consultation_id);
+            CREATE INDEX IF NOT EXISTS idx_callbacks_createdAt ON callbacks(createdAt DESC);
+            """
+        )
+        db_conn.commit()
+
+
+_init_sqlite()
 
 
 # --- Models ---
@@ -232,12 +331,17 @@ async def root():
 async def create_status_check(input: StatusCheckCreate):
     status_dict = input.dict()
     status_obj = StatusCheck(**status_dict)
-    await db.status_checks.insert_one(status_obj.dict())
+    _db_exec(
+        "INSERT INTO status_checks (id, client_name, timestamp) VALUES (?, ?, ?)",
+        (status_obj.id, status_obj.client_name, status_obj.timestamp.isoformat()),
+    )
     return status_obj
 
 @api_router.get("/status", response_model=List[StatusCheck])
 async def get_status_checks():
-    status_checks = await db.status_checks.find().to_list(1000)
+    status_checks = _db_many(
+        "SELECT id, client_name, timestamp FROM status_checks ORDER BY timestamp DESC LIMIT 1000"
+    )
     return [StatusCheck(**sc) for sc in status_checks]
 
 
@@ -266,16 +370,41 @@ async def create_consultation(data: ConsultationCreate):
         "leadSource": GHL_LEAD_SOURCE,
         "createdAt": datetime.now(timezone.utc).isoformat(),
     }
-    await db.consultations.insert_one(consultation_doc)
+    _db_exec(
+        """
+        INSERT INTO consultations (
+            id, fullName, email, phone, address, yardSize, projectType, fenceStyle, timeline, message,
+            smsConsent, smsConsentTimestamp, status, paymentStatus, leadSource, createdAt
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            consultation_doc["id"],
+            consultation_doc["fullName"],
+            consultation_doc["email"],
+            consultation_doc["phone"],
+            consultation_doc["address"],
+            consultation_doc["yardSize"],
+            consultation_doc["projectType"],
+            consultation_doc["fenceStyle"],
+            consultation_doc["timeline"],
+            consultation_doc["message"],
+            1 if consultation_doc["smsConsent"] else 0,
+            consultation_doc["smsConsentTimestamp"],
+            consultation_doc["status"],
+            consultation_doc["paymentStatus"],
+            consultation_doc["leadSource"],
+            consultation_doc["createdAt"],
+        ),
+    )
     logger.info(f"Lead captured: {consultation_id} - {data.fullName}")
 
     # Push to GHL
     try:
         ghl_contact_id = await push_to_ghl(consultation_doc)
         if ghl_contact_id:
-            await db.consultations.update_one(
-                {"id": consultation_id},
-                {"$set": {"ghlContactId": ghl_contact_id}}
+            _db_exec(
+                "UPDATE consultations SET ghlContactId = ? WHERE id = ?",
+                (ghl_contact_id, consultation_id),
             )
     except Exception as e:
         logger.error(f"GHL push error: {e}")
@@ -346,10 +475,26 @@ async def create_consultation(data: ConsultationCreate):
             "status": "pending",
             "createdAt": datetime.now(timezone.utc).isoformat(),
         }
-        await db.payment_transactions.insert_one(payment_doc)
-        await db.consultations.update_one(
-            {"id": consultation_id},
-            {"$set": {"stripeSessionId": session.id}}
+        _db_exec(
+            """
+            INSERT INTO payment_transactions (
+                id, session_id, consultation_id, amount, currency, payment_status, status, createdAt
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                payment_doc["id"],
+                payment_doc["session_id"],
+                payment_doc["consultation_id"],
+                payment_doc["amount"],
+                payment_doc["currency"],
+                payment_doc["payment_status"],
+                payment_doc["status"],
+                payment_doc["createdAt"],
+            ),
+        )
+        _db_exec(
+            "UPDATE consultations SET stripeSessionId = ? WHERE id = ?",
+            (session.id, consultation_id),
         )
 
         logger.info(f"Stripe session {session.id} for {consultation_id}")
@@ -363,12 +508,17 @@ async def create_consultation(data: ConsultationCreate):
 @api_router.get("/consultations/status/{session_id}")
 async def get_consultation_payment_status(session_id: str):
     """Poll payment status after Stripe redirect"""
-    payment = await db.payment_transactions.find_one({"session_id": session_id})
+    payment = _db_one(
+        "SELECT * FROM payment_transactions WHERE session_id = ?",
+        (session_id,),
+    )
     if not payment:
         raise HTTPException(status_code=404, detail="Payment session not found")
 
     if payment.get("payment_status") == "paid":
-        consultation = await db.consultations.find_one({"stripeSessionId": session_id})
+        consultation = _normalize_consultation(
+            _db_one("SELECT * FROM consultations WHERE stripeSessionId = ?", (session_id,))
+        )
         return {
             "status": "complete", "payment_status": "paid",
             "consultation": {"id": consultation["id"], "fullName": consultation.get("fullName")} if consultation else None,
@@ -376,19 +526,21 @@ async def get_consultation_payment_status(session_id: str):
 
     try:
         session = stripe.checkout.Session.retrieve(session_id)
-        await db.payment_transactions.update_one(
-            {"session_id": session_id},
-            {"$set": {"status": session.status, "payment_status": session.payment_status, "updatedAt": datetime.now(timezone.utc).isoformat()}}
+        _db_exec(
+            "UPDATE payment_transactions SET status = ?, payment_status = ?, updatedAt = ? WHERE session_id = ?",
+            (session.status, session.payment_status, datetime.now(timezone.utc).isoformat(), session_id),
         )
 
         if session.payment_status == "paid":
             consultation_id = payment.get("consultation_id")
             if consultation_id:
-                await db.consultations.update_one(
-                    {"id": consultation_id},
-                    {"$set": {"status": "confirmed", "paymentStatus": "paid", "paidAt": datetime.now(timezone.utc).isoformat()}}
+                _db_exec(
+                    "UPDATE consultations SET status = ?, paymentStatus = ?, paidAt = ? WHERE id = ?",
+                    ("confirmed", "paid", datetime.now(timezone.utc).isoformat(), consultation_id),
                 )
-                consultation = await db.consultations.find_one({"id": consultation_id})
+                consultation = _normalize_consultation(
+                    _db_one("SELECT * FROM consultations WHERE id = ?", (consultation_id,))
+                )
                 if consultation:
                     try:
                         await push_to_ghl({**consultation, "paymentStatus": "PAID - $150"}, "consultation")
@@ -396,7 +548,9 @@ async def get_consultation_payment_status(session_id: str):
                         pass
                 logger.info(f"Consultation {consultation_id} confirmed")
 
-        consultation = await db.consultations.find_one({"stripeSessionId": session_id})
+        consultation = _normalize_consultation(
+            _db_one("SELECT * FROM consultations WHERE stripeSessionId = ?", (session_id,))
+        )
         return {
             "status": session.status, "payment_status": session.payment_status,
             "amount_total": session.amount_total, "currency": session.currency,
@@ -418,7 +572,17 @@ async def create_callback(data: CallbackCreate):
         "leadSource": GHL_LEAD_SOURCE,
         "createdAt": datetime.now(timezone.utc).isoformat(),
     }
-    await db.callbacks.insert_one(callback_doc)
+    _db_exec(
+        "INSERT INTO callbacks (id, name, phone, status, leadSource, createdAt) VALUES (?, ?, ?, ?, ?, ?)",
+        (
+            callback_doc["id"],
+            callback_doc["name"],
+            callback_doc["phone"],
+            callback_doc["status"],
+            callback_doc["leadSource"],
+            callback_doc["createdAt"],
+        ),
+    )
     logger.info(f"Callback: {data.phone}")
 
     try:
@@ -434,28 +598,27 @@ async def create_callback(data: CallbackCreate):
 @api_router.get("/admin/consultations")
 async def get_all_consultations():
     """Get all consultation leads"""
-    docs = await db.consultations.find().sort("createdAt", -1).to_list(500)
-    return [
-        {k: v for k, v in doc.items() if k != "_id"}
-        for doc in docs
-    ]
+    docs = _db_many("SELECT * FROM consultations ORDER BY createdAt DESC LIMIT 500")
+    return [_normalize_consultation(doc) for doc in docs]
 
 @api_router.get("/admin/callbacks")
 async def get_all_callbacks():
     """Get all callback requests"""
-    docs = await db.callbacks.find().sort("createdAt", -1).to_list(500)
-    return [
-        {k: v for k, v in doc.items() if k != "_id"}
-        for doc in docs
-    ]
+    return _db_many("SELECT * FROM callbacks ORDER BY createdAt DESC LIMIT 500")
 
 @api_router.get("/admin/stats")
 async def get_admin_stats():
     """Dashboard stats"""
-    total_consultations = await db.consultations.count_documents({})
-    paid_consultations = await db.consultations.count_documents({"paymentStatus": "paid"})
-    pending_consultations = await db.consultations.count_documents({"paymentStatus": {"$ne": "paid"}})
-    total_callbacks = await db.callbacks.count_documents({})
+    total_consultations = _db_one("SELECT COUNT(*) AS c FROM consultations")["c"]
+    paid_consultations = _db_one(
+        "SELECT COUNT(*) AS c FROM consultations WHERE paymentStatus = ?",
+        ("paid",),
+    )["c"]
+    pending_consultations = _db_one(
+        "SELECT COUNT(*) AS c FROM consultations WHERE paymentStatus != ?",
+        ("paid",),
+    )["c"]
+    total_callbacks = _db_one("SELECT COUNT(*) AS c FROM callbacks")["c"]
     return {
         "totalConsultations": total_consultations,
         "paidConsultations": paid_consultations,
@@ -466,6 +629,7 @@ async def get_admin_stats():
 
 # Include router
 app.include_router(api_router)
+app.include_router(lead_router_router)
 
 
 # --- Stripe Webhook (outside /api prefix — Stripe posts directly) ---
@@ -480,32 +644,26 @@ async def handle_successful_payment(session):
     now = datetime.now(timezone.utc).isoformat()
 
     # Update consultation
-    await db.consultations.update_one(
-        {"id": consultation_id},
-        {"$set": {
-            "status": "confirmed",
-            "paymentStatus": "paid",
-            "paidAt": now,
-        }}
+    _db_exec(
+        "UPDATE consultations SET status = ?, paymentStatus = ?, paidAt = ? WHERE id = ?",
+        ("confirmed", "paid", now, consultation_id),
     )
 
     # Update payment transaction
-    await db.payment_transactions.update_one(
-        {"consultation_id": consultation_id},
-        {"$set": {
-            "payment_status": "paid",
-            "status": "complete",
-            "updatedAt": now,
-        }}
+    _db_exec(
+        "UPDATE payment_transactions SET payment_status = ?, status = ?, updatedAt = ? WHERE consultation_id = ?",
+        ("paid", "complete", now, consultation_id),
     )
 
     logger.info(f"Webhook: Consultation {consultation_id} marked as paid")
 
     # Push updated status to GHL with Paid tag
-    consultation = await db.consultations.find_one({"id": consultation_id})
+    consultation = _normalize_consultation(
+        _db_one("SELECT * FROM consultations WHERE id = ?", (consultation_id,))
+    )
     if consultation:
         try:
-            ghl_data = {k: v for k, v in consultation.items() if k != "_id"}
+            ghl_data = {k: v for k, v in consultation.items()}
             ghl_data["paymentStatus"] = "PAID - $150"
             await push_to_ghl(ghl_data, "consultation")
             logger.info(f"Webhook: GHL updated with Paid tag for {consultation_id}")
@@ -561,4 +719,5 @@ app.add_middleware(
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
-    client.close()
+    with db_lock:
+        db_conn.close()

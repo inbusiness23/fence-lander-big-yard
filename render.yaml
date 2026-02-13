@@ -8,10 +8,8 @@ services:
     healthCheckPath: /api/
     autoDeploy: true
     envVars:
-      - key: MONGO_URL
-        sync: false
-      - key: DB_NAME
-        value: asap_fence
+      - key: SQLITE_DB_PATH
+        value: app.db
       - key: STRIPE_SECRET_KEY
         sync: false
       - key: STRIPE_WEBHOOK_SECRET
