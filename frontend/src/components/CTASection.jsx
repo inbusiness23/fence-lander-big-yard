@@ -16,9 +16,7 @@ import { CONSULTATION_FORM_FIELDS, COMPANY, SATISFACTION_GUARANTEE } from "../da
 import { toast } from "sonner";
 import { validateEmail } from "../lib/emailValidator";
 import axios from "axios";
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+import { API, backendUrlHelpText, hasBackendUrl } from "../lib/api";
 
 export const CTASection = () => {
   const [formData, setFormData] = useState({});
@@ -89,6 +87,10 @@ export const CTASection = () => {
   };
 
   const handlePayment = async () => {
+    if (!hasBackendUrl) {
+      toast.error(backendUrlHelpText);
+      return;
+    }
     setLoading(true);
     try {
       const response = await axios.post(`${API}/consultations`, {
