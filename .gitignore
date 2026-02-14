@@ -83,3 +83,6 @@ android-sdk/ -e
 *.env.*
 !*.env.example
 !**/.env.example
+
+# Local deploy helpers (may contain secrets)
+.deploy-secrets.sh

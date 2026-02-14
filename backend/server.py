@@ -92,6 +92,10 @@ def _init_sqlite() -> None:
                 email TEXT NOT NULL,
                 phone TEXT,
                 address TEXT NOT NULL,
+                addressStreet TEXT,
+                city TEXT,
+                state TEXT,
+                postalCode TEXT,
                 yardSize TEXT NOT NULL,
                 projectType TEXT NOT NULL,
                 fenceStyle TEXT,
@@ -139,6 +143,23 @@ def _init_sqlite() -> None:
         )
         db_conn.commit()
 
+    # Lightweight migrations for existing databases (Render redeploys, etc.).
+    def _has_col(table: str, col: str) -> bool:
+        with db_lock:
+            rows = db_conn.execute(f"PRAGMA table_info({table})").fetchall()
+        return any(r[1] == col for r in rows)
+
+    for col, coltype in (
+        ("addressStreet", "TEXT"),
+        ("city", "TEXT"),
+        ("state", "TEXT"),
+        ("postalCode", "TEXT"),
+    ):
+        if not _has_col("consultations", col):
+            with db_lock:
+                db_conn.execute(f"ALTER TABLE consultations ADD COLUMN {col} {coltype}")
+                db_conn.commit()
+
 
 _init_sqlite()
 
@@ -158,6 +179,11 @@ class ConsultationCreate(BaseModel):
     email: str
     phone: Optional[str] = None
     address: str
+    # Parsed address fields (from Google Places Autocomplete). Optional.
+    addressStreet: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    postalCode: Optional[str] = None
     yardSize: str
     projectType: str
     fenceStyle: Optional[str] = None
@@ -206,6 +232,11 @@ async def push_to_ghl(data: dict, lead_type: str = "consultation"):
         notes = []
         if data.get("address"):
             notes.append(f"Property: {data['address']}")
+        if data.get("city") or data.get("state") or data.get("postalCode"):
+            notes.append(
+                "Parsed: "
+                + ", ".join([x for x in [data.get("city"), data.get("state"), data.get("postalCode")] if x])
+            )
         if data.get("yardSize"):
             notes.append(f"Yard Size: {data['yardSize']}")
         if data.get("projectType"):
@@ -228,7 +259,11 @@ async def push_to_ghl(data: dict, lead_type: str = "consultation"):
             "lastName": last_name,
             "email": data.get("email", ""),
             "phone": data.get("phone", ""),
-            "address1": data.get("address", ""),
+            # Prefer a parsed street address if available, otherwise fall back to whatever the user typed.
+            "address1": data.get("addressStreet") or data.get("address1") or data.get("address", ""),
+            "city": data.get("city", "") or "",
+            "state": data.get("state", "") or "",
+            "postalCode": data.get("postalCode", "") or "",
             "source": GHL_LEAD_SOURCE,
             "tags": tags,
             "locationId": GHL_LOCATION_ID,
@@ -370,6 +405,10 @@ async def create_consultation(data: ConsultationCreate):
         "email": data.email,
         "phone": data.phone,
         "address": data.address,
+        "addressStreet": data.addressStreet,
+        "city": data.city,
+        "state": data.state,
+        "postalCode": data.postalCode,
         "yardSize": data.yardSize,
         "projectType": data.projectType,
         "fenceStyle": data.fenceStyle,
@@ -385,9 +424,10 @@ async def create_consultation(data: ConsultationCreate):
     _db_exec(
         """
         INSERT INTO consultations (
-            id, fullName, email, phone, address, yardSize, projectType, fenceStyle, timeline, message,
+            id, fullName, email, phone, address, addressStreet, city, state, postalCode,
+            yardSize, projectType, fenceStyle, timeline, message,
             smsConsent, smsConsentTimestamp, status, paymentStatus, leadSource, createdAt
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             consultation_doc["id"],
@@ -395,6 +435,10 @@ async def create_consultation(data: ConsultationCreate):
             consultation_doc["email"],
             consultation_doc["phone"],
             consultation_doc["address"],
+            consultation_doc["addressStreet"],
+            consultation_doc["city"],
+            consultation_doc["state"],
+            consultation_doc["postalCode"],
             consultation_doc["yardSize"],
             consultation_doc["projectType"],
             consultation_doc["fenceStyle"],
