@@ -298,7 +298,8 @@ async def _ghl_add_note(contact_id: str, note_body: str) -> None:
         resp = await http_client.post(
             f"{_ghl_base_url()}/contacts/{contact_id}/notes",
             headers=_ghl_headers(),
-            json={"body": note_body, "contactId": contact_id},
+            # GHL notes endpoint infers contactId from the URL; including it in the body can 422.
+            json={"body": note_body},
         )
         if resp.status_code not in (200, 201):
             logger.warning("GHL note failed: %s %s", resp.status_code, resp.text)
