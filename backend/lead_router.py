@@ -98,8 +98,10 @@ def _ghl_headers() -> Dict[str, str]:
         raise HTTPException(status_code=500, detail="Missing GHL_API_KEY")
     return {
         "Authorization": f"Bearer {token}",
+        "Accept": "application/json",
         "Content-Type": "application/json",
         "Version": "2021-07-28",
+        "User-Agent": "asap-fence-backend/1.0",
     }
 
 

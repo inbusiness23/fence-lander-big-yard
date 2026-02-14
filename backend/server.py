@@ -236,8 +236,11 @@ async def push_to_ghl(data: dict, lead_type: str = "consultation"):
 
         headers = {
             "Authorization": f"Bearer {GHL_API_KEY}",
+            "Accept": "application/json",
             "Content-Type": "application/json",
             "Version": "2021-07-28",
+            # Some GHL/Cloudflare edges block requests without a UA.
+            "User-Agent": "asap-fence-backend/1.0",
         }
 
         async with httpx.AsyncClient(timeout=15.0) as http_client:
@@ -299,8 +302,10 @@ async def push_callback_to_ghl(name: str, phone: str):
 
         headers = {
             "Authorization": f"Bearer {GHL_API_KEY}",
+            "Accept": "application/json",
             "Content-Type": "application/json",
             "Version": "2021-07-28",
+            "User-Agent": "asap-fence-backend/1.0",
         }
 
         async with httpx.AsyncClient(timeout=15.0) as http_client:
