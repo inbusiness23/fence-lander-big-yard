@@ -232,11 +232,12 @@ async def push_to_ghl(data: dict, lead_type: str = "consultation"):
         notes = []
         if data.get("address"):
             notes.append(f"Property: {data['address']}")
-        if data.get("city") or data.get("state") or data.get("postalCode"):
-            notes.append(
-                "Parsed: "
-                + ", ".join([x for x in [data.get("city"), data.get("state"), data.get("postalCode")] if x])
-            )
+        # Include parsed parts when available (keeps one user-facing field but preserves structure).
+        parsed_state_zip = " ".join([x for x in [data.get("state"), data.get("postalCode")] if x]).strip()
+        parsed_city_state_zip = ", ".join([x for x in [data.get("city"), parsed_state_zip] if x]).strip()
+        parsed_line = ", ".join([x for x in [data.get("addressStreet"), parsed_city_state_zip] if x]).strip()
+        if parsed_line:
+            notes.append(f"Parsed: {parsed_line}")
         if data.get("yardSize"):
             notes.append(f"Yard Size: {data['yardSize']}")
         if data.get("projectType"):
