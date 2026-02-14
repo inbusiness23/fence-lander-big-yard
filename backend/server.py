@@ -404,6 +404,7 @@ async def create_consultation(data: ConsultationCreate):
     logger.info(f"Lead captured: {consultation_id} - {data.fullName}")
 
     # Push to GHL
+    ghl_contact_id = None
     try:
         ghl_contact_id = await push_to_ghl(consultation_doc)
         if ghl_contact_id:
@@ -503,7 +504,13 @@ async def create_consultation(data: ConsultationCreate):
         )
 
         logger.info(f"Stripe session {session.id} for {consultation_id}")
-        return {"id": consultation_id, "checkoutUrl": session.url, "sessionId": session.id}
+        # Include ghlContactId to make verification/debugging easy (does not expose any secrets).
+        return {
+            "id": consultation_id,
+            "checkoutUrl": session.url,
+            "sessionId": session.id,
+            "ghlContactId": ghl_contact_id,
+        }
 
     except Exception as e:
         logger.error(f"Stripe error: {e}")
@@ -591,11 +598,12 @@ async def create_callback(data: CallbackCreate):
     logger.info(f"Callback: {data.phone}")
 
     try:
-        await push_callback_to_ghl(data.name, data.phone)
+        contact_id = await push_callback_to_ghl(data.name, data.phone)
     except Exception as e:
         logger.error(f"GHL callback error: {e}")
+        contact_id = None
 
-    return {"status": "ok"}
+    return {"status": "ok", "ghlContactId": contact_id}
 
 
 # --- Admin Endpoints ---
