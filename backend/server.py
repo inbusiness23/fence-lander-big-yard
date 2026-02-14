@@ -260,12 +260,20 @@ async def push_to_ghl(data: dict, lead_type: str = "consultation"):
                         "body": f"[{GHL_LEAD_SOURCE}]\n" + "\n".join(notes),
                         "contactId": contact_id,
                     }
-                    await http_client.post(
+                    note_resp = await http_client.post(
                         f"{GHL_BASE_URL}/contacts/{contact_id}/notes",
                         json=note_payload,
                         headers=headers,
                     )
-                    logger.info(f"GHL note added for contact {contact_id}")
+                    if note_resp.status_code in (200, 201):
+                        logger.info(f"GHL note added for contact {contact_id}")
+                    else:
+                        # Don't fail the lead capture if notes fail; log for debugging.
+                        logger.warning(
+                            "GHL note failed %s: %s",
+                            note_resp.status_code,
+                            (note_resp.text or "")[:500],
+                        )
 
                 return contact_id
             else:
