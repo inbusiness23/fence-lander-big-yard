@@ -86,3 +86,6 @@ android-sdk/ -e
 
 # Local deploy helpers (may contain secrets)
 .deploy-secrets.sh
+
+# Playwright CLI artifacts
+.playwright-cli/
