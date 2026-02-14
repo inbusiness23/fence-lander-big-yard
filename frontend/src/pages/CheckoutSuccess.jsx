@@ -3,15 +3,18 @@ import { CheckCircle2, Phone, ArrowRight, ShieldCheck, Loader2, Clock } from "lu
 import { Button } from "../components/ui/button";
 import { COMPANY } from "../data/mock";
 import axios from "axios";
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+import { API, backendUrlHelpText, hasBackendUrl } from "../lib/api";
 
 export default function CheckoutSuccess() {
   const [status, setStatus] = useState("checking");
   const [consultation, setConsultation] = useState(null);
 
   useEffect(() => {
+    if (!hasBackendUrl) {
+      setStatus("error");
+      return;
+    }
+
     const params = new URLSearchParams(window.location.search);
     const sessionId = params.get("session_id");
 
@@ -159,7 +162,7 @@ export default function CheckoutSuccess() {
             <p className="text-stone-500 text-lg leading-relaxed mb-8">
               {status === "expired"
                 ? "Your payment session has expired. Please try booking again."
-                : "We received your information. If your payment was processed, your project manager will reach out to you right away to get your VIP appointment set up. If you have any questions, give us a call."}
+                : backendUrlHelpText}
             </p>
             <div className="space-y-3">
               <a href="/#consultation-form">

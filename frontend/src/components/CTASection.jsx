@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Phone, CheckCircle2, ShieldCheck, ArrowLeft, Lock, CreditCard, AlertCircle } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -16,9 +16,8 @@ import { CONSULTATION_FORM_FIELDS, COMPANY, SATISFACTION_GUARANTEE } from "../da
 import { toast } from "sonner";
 import { validateEmail } from "../lib/emailValidator";
 import axios from "axios";
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+import { API, backendUrlHelpText, hasBackendUrl } from "../lib/api";
+import { loadGooglePlaces, parseUsAddressComponents } from "../lib/googlePlaces";
 
 export const CTASection = () => {
   const [formData, setFormData] = useState({});
@@ -27,6 +26,7 @@ export const CTASection = () => {
   const [smsConsent, setSmsConsent] = useState(false);
   const [emailError, setEmailError] = useState(null);
   const [emailSuggestion, setEmailSuggestion] = useState(null);
+  const addressInputRef = useRef(null);
 
   const handleChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -35,6 +35,53 @@ export const CTASection = () => {
       setEmailSuggestion(null);
     }
   };
+
+  useEffect(() => {
+    // Attach Google Places Autocomplete to the address field (option 1).
+    if (step !== 1) return;
+    const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+    if (!apiKey) return;
+    if (!addressInputRef.current) return;
+
+    let listener = null;
+    let autocomplete = null;
+    let cancelled = false;
+
+    loadGooglePlaces(apiKey)
+      .then(() => {
+        if (cancelled) return;
+        if (!window.google?.maps?.places) return;
+
+        autocomplete = new window.google.maps.places.Autocomplete(addressInputRef.current, {
+          types: ["address"],
+          componentRestrictions: { country: "us" },
+          fields: ["formatted_address", "address_components"],
+        });
+
+        listener = autocomplete.addListener("place_changed", () => {
+          const place = autocomplete.getPlace();
+          const parsed = parseUsAddressComponents(place);
+
+          if (place?.formatted_address) {
+            handleChange("address", place.formatted_address);
+          }
+          if (parsed.streetAddress) handleChange("addressStreet", parsed.streetAddress);
+          if (parsed.city) handleChange("city", parsed.city);
+          if (parsed.state) handleChange("state", parsed.state);
+          if (parsed.postalCode) handleChange("postalCode", parsed.postalCode);
+        });
+      })
+      .catch(() => {
+        // If Maps fails to load (blocked, missing billing, etc.), keep manual entry.
+      });
+
+    return () => {
+      cancelled = true;
+      if (listener && window.google?.maps?.event?.removeListener) {
+        window.google.maps.event.removeListener(listener);
+      }
+    };
+  }, [step]);
 
   const handleEmailBlur = () => {
     if (!formData.email) return;
@@ -89,6 +136,10 @@ export const CTASection = () => {
   };
 
   const handlePayment = async () => {
+    if (!hasBackendUrl) {
+      toast.error(backendUrlHelpText);
+      return;
+    }
     setLoading(true);
     try {
       const response = await axios.post(`${API}/consultations`, {
@@ -326,6 +377,32 @@ export const CTASection = () => {
                                 )}
                               </span>
                             </div>
+                          )}
+                        </div>
+                      );
+                    }
+
+                    if (field.name === "address") {
+                      const mapsEnabled = Boolean(process.env.REACT_APP_GOOGLE_MAPS_API_KEY);
+                      return (
+                        <div key={field.name} className="sm:col-span-2">
+                          <Label className="text-stone-700 font-medium text-sm mb-2 block">
+                            {field.label}
+                            {field.required && <span className="text-amber-600 ml-1">*</span>}
+                          </Label>
+                          <Input
+                            ref={addressInputRef}
+                            type="text"
+                            placeholder={field.placeholder}
+                            value={formData.address || ""}
+                            onChange={(e) => handleChange("address", e.target.value)}
+                            autoComplete={mapsEnabled ? "off" : "street-address"}
+                            className="border-stone-200 focus:border-amber-500 focus:ring-amber-500/20 rounded-lg h-11"
+                          />
+                          {mapsEnabled && (
+                            <p className="mt-1 text-[11px] text-stone-400">
+                              Start typing and pick an address suggestion to auto-fill city and zip.
+                            </p>
                           )}
                         </div>
                       );

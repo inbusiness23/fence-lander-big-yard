@@ -4,17 +4,23 @@ import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import axios from "axios";
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+import { API, backendUrlHelpText, hasBackendUrl } from "../lib/api";
 
 export default function AdminDashboard() {
   const [consultations, setConsultations] = useState([]);
   const [callbacks, setCallbacks] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [configError, setConfigError] = useState("");
 
   const fetchData = async () => {
+    if (!hasBackendUrl) {
+      setConfigError(backendUrlHelpText);
+      setLoading(false);
+      return;
+    }
+
+    setConfigError("");
     setLoading(true);
     try {
       const [consulRes, callbackRes, statsRes] = await Promise.all([
@@ -71,6 +77,12 @@ export default function AdminDashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {configError && (
+          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            {configError}
+          </div>
+        )}
+
         {/* Stats Cards */}
         {stats && (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
